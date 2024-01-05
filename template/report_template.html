@@ -1,0 +1,218 @@
+<html lang="en">
+<!DOCTYPE html>
+<head>
+<title>Metagenomics validation report</title>
+<!-- Chris CSS -->
+<!-- <link rel="stylesheet" type="text/css" href="./modified_bootstrap_compatible_css.css">--> 
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+    
+
+<body>
+
+    <div class="container">
+        <div class="row align-items-center">
+            <!-- Left Image -->
+            <div class="col-md-4 d-flex justify-content-start">
+                <img src="../template/CIDR_logo.jpeg" class="img-fluid" alt="Left Image">
+            </div>
+    
+            <!-- Title -->
+            <div class="col-md-4 text-center">
+                <h2>Metagenomics organism query</h2>
+            </div>
+    
+            <!-- Right Image -->
+            <div class="col-md-4 d-flex justify-content-end">
+                <img src="../template/GSTT_LOGO.jpeg" class="img-fluid" alt="Right Image">
+            </div>
+        </div>
+    </div>
+
+    <!--Main report-->
+    <div class="container-fluid px-4">
+        <div class="card mb-4">
+        <div class="card-header"><strong>Patient Information</strong></div>
+            <div class="col-sm">
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <tbody>
+                            <tr>
+                                <th>Lab ID</th>
+                                <td>{{report.LabID}}</td>
+                                <th>Date-Time</th>
+                                <td>{{report.date.strftime("%m/%d/%Y-%H:%M:%S")}}</td>
+                                <th>Input type</th>
+                                <td>{{report.input_format}}</td>
+                            </tr>
+                            <tr>
+                                <th>Sample_ID</th>
+                                <td>{{report.SampleID}}</td>
+                                <th>Time Interval</th>
+                                <td>{{report.time}}</td>
+                                <th>Barcode</th>
+                                <td>{{report.Barcode}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>  
+            </div>
+        </div>                
+        <!--
+        <div class="card mb-4">
+
+            <div class="card-header"><strong>Quality control</strong></div>
+            <div class="col-sm">
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <tr>
+                            <th scope="row">Total microbial reads</th>
+                            <td>{{report.micro_reads}}</td>
+                            <th scope="row">Total reads</th>
+                            <td>{{report.total_reads}}</td>
+                            <th scope="row">Total human reads</th>
+                            <td>{{report.human_reads}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Total bases</th>
+                            <td>{{report.total_bp}}</td>
+                            <th scope="row">Mean read length</th>
+                            <td>{{report.mean_read_len}}</td>
+                            <th scope="row">Mean read quality</th>
+                            <td>{{report.mean_read_qual}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Internal control (TMV) </th>
+                            <td>{{report.ic}}</td>
+                            <th scope="row">Negative Control</th>
+                            <td class="checkbox"><input type="checkbox" name="Pass", id="NC" \> Pass <input type="checkbox" name="Fail", id="NC" \> Fail </td>
+                            <th scope="row">Unclassified/Below Threshold</th>
+                            <td>{{report.unclass_reads}}/{{report.reads_below_threshold}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+-->
+        <div class="card mb-4">
+        <div class="card-header"><strong>BLAST QC</strong></div>
+            <div class="col-sm">
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <tr>
+                            <th scope="row">Total reads parsed</th>
+                            <td>{{report.total_fastq_reads}}</td>
+                            <th scope="row">Target organism</th>
+                            <td>{{report.organism}}</td>
+                            <th scope="row">Target organism reads</th>
+                            <td>{{report.organism_read_count}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">BLAST database</th>
+                            <td>{{report.blast_db}}</td>
+                            <th scope="row"></th>
+                            <td>{{report.min_expect}}</td>
+                            <th scope="row"></th>
+                            <td>{{report.max_identity}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-header"><strong>BLAST report</strong></div>
+                <div class="col-sm">
+                    <div class="card-body">
+                        <table class="table table-hover">
+                                <tr>
+                                    <th colspan="4" style="text-align: left;"><b>Most Supported Organism</b></th>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Name</th>
+                                    <td>{{report.most_common[0]}}</td>
+                                    <th scope="row">Ave. query length (bp)</th>
+                                    <td>{{report.most_common[1]}}</td>
+                                    <th scope="row">Ave identity (%)</th>
+                                    <td>{{report.most_common[2]}}</td>
+                                    <th scope="row">Lowest e-score</th>
+                                    <td>{{report.most_common[3]}}</td>
+                                    <th scope="row">Supporting reads</th>
+                                    <td>{{report.most_common[4]}}</td>
+                                </tr>
+                                <tr>
+                                    <th colspan="4" style="text-align: left;"><b>Second-Most Supported Organism</b></th>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Name</th>
+                                    <td>{{report.second_most_common[0]}}</td>
+                                    <th scope="row">Ave. query length (bp)</th>
+                                    <td>{{report.second_most_common[1]}}</td>
+                                    <th scope="row">Ave identity (%)</th>
+                                    <td>{{report.second_most_common[2]}}</td>
+                                    <th scope="row">Lowest e-score</th>
+                                    <td>{{report.second_most_common[3]}}</td>
+                                    <th scope="row">Supporting reads</th>
+                                    <td>{{report.second_most_common[4]}}</td>
+                                </tr>                          
+                        </table>
+                    </div>
+                </div>
+            </div>
+        <div class="card mb-4">
+        <div class="card-header"><strong>BLAST hit graph</strong></div>
+            <div class="card-body">
+                <div class="container-fluid" style="padding: 0;"> <!-- Ensure no padding on the container -->
+                    <div class="row">
+                        <div class="col-12" style="padding: 0;"> <!-- Ensure no padding on the column -->
+                            <!-- Inline CSS for iframe -->
+                            <iframe src="http://127.0.0.1:8050/" style="width: 100%; height: 65vh; border: none;" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>                
+            </div>
+        </div>
+        <div class="card mb-4">
+        <div class="card-header"><strong>BLAST alignment visualisation</strong></div>
+                <div class="col-sm">
+                    <div class="card-body">
+                        <h6>Read number</h6>
+                        <!-- Bootstrap 5 Pagination -->
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination">
+                            {{report.BLAST1}}
+                            </ul>
+                        </nav>
+                        <!-- Content Sections -->
+                        {{report.BLAST2}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+</body>
+
+
+    <!-- JavaScript -->
+    <script>
+        function showSection(sectionNumber) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show the selected section
+            document.getElementById('section' + sectionNumber).style.display = 'block';
+            
+            // Update active state for pagination links
+            // Adjust sectionNumber for 0-indexed page numbers
+            document.querySelectorAll('.pagination .page-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector('.pagination .page-item:nth-child(' + (sectionNumber + 1) +')').classList.add('active');
+        }
+    </script>
+    
+
