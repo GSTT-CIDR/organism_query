@@ -1,6 +1,6 @@
 # Metagenomics organism query 
 ### Overview
-This Python script automates querying a subset of NGS reads, based on previous taxonomic classification, using BLASTn. The output produces a report helping the reader understand BLAST results and find the most likely origin of the sequence.
+This package automates querying a subset of NGS reads based on previous taxonomic classification using BLASTn. The output produces a report helping the reader understand BLAST results and find the most likely species origin of the sequence.
 
 ### Dependancies
 An explicit list to build a conda env can be found in the ```./conda/``` directory. In short:
