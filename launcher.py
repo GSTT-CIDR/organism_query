@@ -27,7 +27,7 @@ root.title("Script Launcher")
 description = tk.Label(root, text="This is a launcher for your script.")
 description.pack()
 
-image = tk.PhotoImage(file="~/Downloads/nhs.png")  # Update with the path to your image
+image = tk.PhotoImage(file="./organism_query/template/CIDR_logo.png")  # Update with the path to your image
 image_label = tk.Label(root, image=image)
 image_label.pack()
 

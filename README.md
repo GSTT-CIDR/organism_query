@@ -5,6 +5,13 @@ This Python script automates querying a subset of NGS reads, based on previous t
 ### Dependancies
 An explicit list to build a conda env can be found in the ```./conda/``` directory. In short:
 * NCBI BLAST
+
+### Important notes
+
+Intepreting BLAST
+Must be SPP name as in the reports
+
+* 
 ### Inputs
 The script parses the outputs of EPI2ME or the CIDR metagenomics workflows and raw sequencing reads. 
 

@@ -45,20 +45,12 @@
                                 <td>{{report.LabID}}</td>
                                 <th>Date-Time</th>
                                 <td>{{report.date.strftime("%m/%d/%Y-%H:%M:%S")}}</td>
+                                <th>Input type</th>
+                                <td>{{report.input_format}}</td>
                             </tr>
                             <tr>
-                                <th>Patient ID</th>
-                                <td>{{report.PatientID}}</td>
-                                <th>Experiment Folder</th>
-                                <td>{{report.Experiment}}</td>
-                            </tr>
-                            <tr>
-                                <th>Sample Type</th>
-                                <td>{{report.SampleType}}</td>
                                 <th>Sample_ID</th>
                                 <td>{{report.SampleID}}</td>
-                            </tr>
-                            <tr>
                                 <th>Time Interval</th>
                                 <td>{{report.time}}</td>
                                 <th>Barcode</th>
@@ -106,7 +98,7 @@
         </div>
 -->
         <div class="card mb-4">
-        <div class="card-header"><strong>BLAST metrics</strong></div>
+        <div class="card-header"><strong>BLAST QC</strong></div>
             <div class="col-sm">
                 <div class="card-body">
                     <table class="table table-hover">
@@ -121,21 +113,54 @@
                         <tr>
                             <th scope="row">BLAST database</th>
                             <td>{{report.blast_db}}</td>
-                            <th scope="row">Min e-score</th>
+                            <th scope="row"></th>
                             <td>{{report.min_expect}}</td>
-                            <th scope="row">Max alignment %</th>
+                            <th scope="row"></th>
                             <td>{{report.max_identity}}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">1st abundant organism</th>
-                            <td>{{report.primary_organism}}</td>
-                            <th scope="row">2nd abundant organism</th>
-                            <td>{{report.secondary_organism}}</td>
                         </tr>
                     </table>
                 </div>
             </div>
         </div>
+        <div class="card mb-4">
+            <div class="card-header"><strong>BLAST report</strong></div>
+                <div class="col-sm">
+                    <div class="card-body">
+                        <table class="table table-hover">
+                                <tr>
+                                    <th colspan="4" style="text-align: left;"><b>Most Supported Organism</b></th>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Name</th>
+                                    <td>{{report.most_common[0]}}</td>
+                                    <th scope="row">Ave. query length (bp)</th>
+                                    <td>{{report.most_common[1]}}</td>
+                                    <th scope="row">Ave identity (%)</th>
+                                    <td>{{report.most_common[2]}}</td>
+                                    <th scope="row">Lowest e-score</th>
+                                    <td>{{report.most_common[3]}}</td>
+                                    <th scope="row">Supporting reads</th>
+                                    <td>{{report.most_common[4]}}</td>
+                                </tr>
+                                <tr>
+                                    <th colspan="4" style="text-align: left;"><b>Second-Most Supported Organism</b></th>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Name</th>
+                                    <td>{{report.second_most_common[0]}}</td>
+                                    <th scope="row">Ave. query length (bp)</th>
+                                    <td>{{report.second_most_common[1]}}</td>
+                                    <th scope="row">Ave identity (%)</th>
+                                    <td>{{report.second_most_common[2]}}</td>
+                                    <th scope="row">Lowest e-score</th>
+                                    <td>{{report.second_most_common[3]}}</td>
+                                    <th scope="row">Supporting reads</th>
+                                    <td>{{report.second_most_common[4]}}</td>
+                                </tr>                          
+                        </table>
+                    </div>
+                </div>
+            </div>
         <div class="card mb-4">
         <div class="card-header"><strong>BLAST hit graph</strong></div>
             <div class="card-body">

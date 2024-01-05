@@ -1,0 +1,5 @@
+; Start the section for BLAST configuration
+[BLAST]
+; Specifies the path where BLAST databases are installed
+BLASTDB=/media/dan_cidr/cidr_office_stor/blastdb
+; end of file
