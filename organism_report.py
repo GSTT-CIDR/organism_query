@@ -263,6 +263,7 @@ def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir
 
     report_dict = {"time": 'TEST' + " hrs",
                 "title": "Clinical metagenomics report",
+                "path": os.getcwd(),
                 "SampleID": sample_id,
                 "time": time_interval,
                 "input_format": input_format,

@@ -21,14 +21,32 @@ def choose_file(entry):
 blast_db_dir = ""
 
 def compile_and_launch():
-    args = [
-#        f"-c {entry1.get()}",
-        f"-e {entry2.get()}",
-        f"-f {entry3.get()}",
-        f"-o {entry4.get()}",
-        f"-d {entry5.get()}",
-        f"-b /media/dan_cidr/cidr_office_stor/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
-    ]
+    
+    # Determine whether EPI2ME or CIDR input is used
+    entry1_text = entry1.get()
+    entry2_text = entry2.get()
+    
+    if entry1_text and entry2_text:
+        messagebox.showerror("Error", "Both report entries are filled. Please fill only one.")
+    elif entry1_text:
+        args = [
+            f"-c {entry1.get()}",
+            f"-f {entry3.get()}",
+            f"-o {entry4.get()}",
+            f"-d {entry5.get()}/",
+            f"-b /media/dan_cidr/cidr_office_stor/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
+        ]
+    elif entry2_text:
+        args = [
+            f"-e {entry2.get()}",
+            f"-f {entry3.get()}",
+            f"-o {entry4.get()}",
+            f"-d {entry5.get()}/",
+            f"-b /media/dan_cidr/cidr_office_stor/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
+        ]
+    else:
+        messagebox.showinfo("Result", "No entries filled.")
+    # Form the final command to be executed
     command = f"python organism_report.py {' '.join(args)}"
     # Execute the command here, e.g., using os.system or subprocess.run
     subprocess.run(command, shell=True)
