@@ -44,7 +44,7 @@ def compile_and_launch():
             f"-f {entry3.get()}",
             f"-o {entry4.get()}",
             f"-d {entry5.get()}/",
-            f"-b /media/dan_cidr/cidr_office_stor/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
+            f"-b /mnt/media/dan_cidr/cidr_office_stor/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
         ]
     else:
         messagebox.showinfo("Result", "No entries filled.")
