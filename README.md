@@ -6,6 +6,11 @@ This package automates querying a subset of NGS reads based on previous taxonomi
 An explicit list to build a conda env can be found in the ```./conda/``` directory. In short:
 * NCBI BLAST
 
+### Test data
+Download the [NCBI virus BLAST DB](https://ftp.ncbi.nlm.nih.gov/blast/db/ref_viruses_rep_genomes.tar.gz)
+
+
+
 ### Important notes
 
 Intepreting BLAST
