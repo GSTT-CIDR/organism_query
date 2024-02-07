@@ -40,8 +40,6 @@ def parse_args():
 def ensure_trailing_slash(path):
     return os.path.join(path, '')
 
-import sys
-
 def extract_tax_ids(centrifuge_report, organism_name):
     print(ascii_art)
     matches = []
@@ -65,7 +63,7 @@ def extract_tax_ids(centrifuge_report, organism_name):
     
     # Extract Tax_IDs from the top matches
     tax_ids = [line[0].strip().split('\t')[1] for line in top_matches]
-    
+    print(tax_ids)
     sys.stderr.write(f"Identified species: {organism_name}, Tax IDs: {', '.join(tax_ids)}\n")
     return tax_ids
 
