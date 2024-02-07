@@ -53,7 +53,7 @@ def extract_tax_ids(centrifuge_report, organism_name):
                     rank_value = int(parts[3])
                     matches.append((line, rank_value))
                 except ValueError:
-                    print(FAIL)
+                    print("FAIL")
                     continue
     print(matches)
     # Sort matches based on the integer in the 4th column, in descending order
