@@ -47,14 +47,15 @@ def extract_tax_ids(centrifuge_report, organism_name):
         for line in file:
             if organism_name in line:
                 parts = line.strip().split('\t')
+                print(parts)
                 try:
                     # Assuming the 4th column contains an integer to rank by
                     rank_value = int(parts[3])
                     matches.append((line, rank_value))
                 except ValueError:
-                    # Handle the case where conversion to int fails
+                    print(FAIL)
                     continue
-    
+    print(matches)
     # Sort matches based on the integer in the 4th column, in descending order
     matches.sort(key=lambda x: x[1], reverse=True)
     
