@@ -5,7 +5,12 @@ from tkinter import Tk, Label
 from tkinter import filedialog
 from PIL import Image, ImageTk
 import subprocess
+import datetime
+import os
 
+current_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
+
+# Function to choose a directory
 def choose_directory(entry):
     directory = filedialog.askdirectory()
     entry.delete(0, tk.END)
@@ -29,25 +34,30 @@ def compile_and_launch():
     if entry1_text and entry2_text:
         messagebox.showerror("Error", "Both report entries are filled. Please fill only one.")
     elif entry1_text:
+        directory_path = f"/mnt/reports/{entry1.get()}/{entry_4_clean}{current_datetime}/"
+        os.makedirs(directory_path, exist_ok=True)
         args = [
-            f"-c {entry1.get()}",
+            f"-c /mnt/results/{entry1.get()}/{combobox6.get()}_hours/centrifuge/centrifuge_raw.tsv",
             f"-f {entry3.get()}",
             f"-o {entry4.get()}",
-            f"-d {entry5.get()}/",
+            f"-d /mnt/reports/{entry1.get()}/organism_query_{entry_4_clean}{current_datetime}/",
 #edit for running on container
 #            f"-b /media/dan_cidr/cidr_office_stor/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
-            f"-b /mnt/media/dan_cidr/cidr_office_stor/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
+            f"-b /mnt/db/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
         ]
     elif entry2_text:
+        folder_path = os.path.dirname(entry2.get)
+        directory_path = f"{folder_path}/organism_query_{entry_4_clean}{current_datetime}/"
+        os.makedirs(directory_path, exist_ok=True)
         args = [
             f"-e {entry2.get()}",
             f"-f {entry3.get()}",
             f"-o {entry4.get()}",
-            f"-d {entry5.get()}/",
-            f"-b /mnt/media/dan_cidr/cidr_office_stor/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
+            f"-d {folder_path}/organism_query_{entry_4_clean}{current_datetime}/",
+            f"-b /mnt/db/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
         ]
     else:
-        messagebox.showinfo("Result", "No entries filled.")
+        messagebox.showinfo("Result", "Insufficient entries.")
     # Form the final command to be executed
     command = f"python organism_report.py {' '.join(args)}"
     # Execute the command here, e.g., using os.system or subprocess.run
@@ -70,23 +80,27 @@ label.pack()
 # Text section
 description1 = tk.Label(root, text="")
 description1.pack()
-description2 = tk.Label(root, text="Fill out the fields below with the files required for the query to launch.", wraplength=430)
+description2 = tk.Label(root, text="Fill out the fields below with the files required to launch the query.", wraplength=430)
 description2.pack()
 description1 = tk.Label(root, text="")
 description1.pack()
-description3 = tk.Label(root, text="Importantly, you should only fill out one of the report input fields. If you are querying an EPI2ME report, navigate to the CSV downloaded from the EPI2ME website. If you are querying the CIDR metagenomics report, use the second field", wraplength=430)
+description3 = tk.Label(root, text="You should only fill out one of the report input fields. If you are querying an EPI2ME report, navigate to the CSV downloaded from the EPI2ME website.", wraplength=430)
 description3.pack()
 
 
 # Field 1
 frame1 = tk.Frame(root)
 frame1.pack(pady=5)
-label1 = tk.Label(frame1, text="Choose CIDR 'Centrifuge' file")
+label1 = tk.Label(frame1, text="CIDR worklow sample_id")
 label1.pack(side=tk.TOP)
 entry1 = tk.Entry(frame1, width=40)
 entry1.pack(side=tk.LEFT, padx=5)
-button1 = tk.Button(frame1, text="Choose Directory", command=lambda: choose_directory(entry1))
-button1.pack(side=tk.LEFT)
+label6 = tk.Label(frame1, text="CIDR workflow hour/interval")
+label6.pack(side=tk.LEFT, padx=5)  # Adjust the side to LEFT to align with the dropdown
+options = ['0.5', '1', '2', '16', '24']
+combobox6 = ttk.Combobox(frame1, values=options, width=37)
+combobox6.pack(side=tk.RIGHT, padx=5)  # Adjust according to your layout needs
+
 
 # Field 2
 frame2 = tk.Frame(root)
@@ -115,7 +129,8 @@ label4 = tk.Label(frame4, text="Species name")
 label4.pack(side=tk.TOP)
 entry4 = tk.Entry(frame4, width=40)
 entry4.pack(side=tk.LEFT, padx=5)
-
+original_text = entry4.get()  # Get the text from entry4
+entry_4_clean = original_text.lower().replace(' ', '_')
 
 # Dropdown (Combobox) for multiple choice input
 frame_dropdown = tk.Frame(root)
@@ -132,14 +147,14 @@ dropdown.pack(side=tk.LEFT)
 
 
 # Field 5
-frame5 = tk.Frame(root)
-frame5.pack(padx=10)
-label5 = tk.Label(frame5, text="Output directory")
-label5.pack(side=tk.TOP)
-entry5 = tk.Entry(frame5, width=40)
-entry5.pack(side=tk.LEFT, padx=5)
-buttton5 = tk.Button(frame5, text="Choose output directory", command=lambda: choose_directory(entry5))
-buttton5.pack(side=tk.LEFT)
+#frame5 = tk.Frame(root)
+#frame5.pack(padx=10)
+#label5 = tk.Label(frame5, text="Output directory")
+#label5.pack(side=tk.TOP)
+#entry5 = tk.Entry(frame5, width=40)
+#entry5.pack(side=tk.LEFT, padx=5)
+#buttton5 = tk.Button(frame5, text="Choose output directory", command=lambda: choose_directory(entry5))
+#buttton5.pack(side=tk.LEFT)
 
 
 # 'Launch Script' button
