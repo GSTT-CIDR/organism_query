@@ -42,48 +42,45 @@ def ensure_trailing_slash(path):
 
 def extract_tax_ids(centrifuge_report, organism_name):
     print(ascii_art)
-    matches = []
+    tax_ids = []
     with open(centrifuge_report, 'r') as file:
         for line in file:
             if organism_name in line:
                 parts = line.strip().split('\t')
-                print(parts)
-                try:
-                    # Assuming the 4th column contains an integer to rank by
-                    rank_value = int(parts[3])
-                    matches.append((line, rank_value))
-                except ValueError:
-                    print("FAIL")
-                    continue
-    print(matches)
-    # Sort matches based on the integer in the 4th column, in descending order
-    matches.sort(key=lambda x: x[1], reverse=True)
-    
-    # If there are more than 10 matches, keep only the top 10
-    top_matches = matches[:10] if len(matches) > 10 else matches
-    
-    # Extract Tax_IDs from the top matches
-    tax_ids = [line[0].strip().split('\t')[1] for line in top_matches]
-    print(tax_ids)
+                tax_ids.append(parts[1])  # Assuming Tax_ID is the second column
     sys.stderr.write(f"Identified species: {organism_name}, Tax IDs: {', '.join(tax_ids)}\n")
     return tax_ids
 
 
-
 def extract_read_ids(raw_report, tax_ids, output_dir):
-    read_ids = set()
-    read_count = 0
-    with open(raw_report, 'r') as file, open(os.path.join(output_dir, 'matched_read_ids.txt'), 'w') as id_file:
+    matched_reads = []  # List to store tuples of (read_id, score)
+    
+    # Process file to collect all matched reads
+    with open(raw_report, 'r') as file:
         for line in file:
             parts = line.strip().split('\t')
             if parts[2] in tax_ids:  # Assuming taxID is the third column
                 read_id = parts[0]  # Assuming readID is the first column
-                read_ids.add(read_id)
-                id_file.write(read_id + '\n')
-                read_count += 1
-    sys.stderr.write(f"Number of reads matched with TaxIDs: {read_count}\n")
-#    print(read_ids)
+                score = int(parts[3])  # Assuming score is an integer in the fourth column
+                matched_reads.append((read_id, score))
+    
+    # Sort matched reads by score in descending order and select the top 10
+    top_reads = sorted(matched_reads, key=lambda x: x[1], reverse=True)[:10]
+    
+    # Write the top 10 read_ids to the output file and count them
+    read_count = 0
+    read_ids = set()
+    with open(os.path.join(output_dir, 'matched_read_ids.txt'), 'w') as id_file:
+        for read_id, _ in top_reads:
+            id_file.write(read_id + '\n')
+            read_ids.add(read_id)
+            read_count += 1
+    
+    # Output the number of reads matched with TaxIDs
+    sys.stderr.write(f"Number of reads matched with TaxIDs (top 10 by score): {read_count}\n")
+    
     return read_ids
+
 
 
 
