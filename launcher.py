@@ -34,8 +34,12 @@ def compile_and_launch():
     if entry1_text and entry2_text:
         messagebox.showerror("Error", "Both report entries are filled. Please fill only one.")
     elif entry1_text:
-        directory_path = f"/mnt/reports/{entry1.get()}/{entry_4_clean}{current_datetime}/"
+        # Build direcotry path and create directory
+        directory_path = f"/mnt/reports/{entry1.get()}/organism_query_{entry_4_clean}{current_datetime}/"
         os.makedirs(directory_path, exist_ok=True)
+        # Clean organism name for output directory
+        original_text = entry4.get()  # Get the text from entry4
+        entry_4_clean = original_text.lower().replace(' ', '_')
         args = [
             f"-c /mnt/results/{entry1.get()}/{combobox6.get()}_hours/centrifuge/",
             f"-f {entry3.get()}",
@@ -132,8 +136,6 @@ label4 = tk.Label(frame4, text="Species name")
 label4.pack(side=tk.TOP)
 entry4 = tk.Entry(frame4, width=40)
 entry4.pack(side=tk.LEFT, padx=5)
-original_text = entry4.get()  # Get the text from entry4
-entry_4_clean = original_text.lower().replace(' ', '_')
 
 # Dropdown (Combobox) for multiple choice input
 frame_dropdown = tk.Frame(root)
