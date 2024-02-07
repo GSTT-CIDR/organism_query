@@ -342,6 +342,7 @@ def dash_func(output_dir):
 #        Input('pident-slider', 'value'),
 #        Input('color-dropdown', 'value')]
     )
+    
     def update_graph(color_variable):
         filtered_data = process_blast_output(file_path)
         fig = px.scatter(filtered_data, x='Percent Identity (%)', y='evalue', color=color_variable,

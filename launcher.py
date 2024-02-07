@@ -38,14 +38,14 @@ def compile_and_launch():
         original_text = entry4.get()  # Get the text from entry4
         entry_4_clean = original_text.lower().replace(' ', '_').replace("'", "")
         # Build directory path and create directory
-        directory_path = f"/mnt/reports/{entry1.get()}/organism_query_{entry_4_clean}{current_datetime}/"
+        directory_path = f"/mnt/reports/{entry1.get()}/organism_query_{entry_4_clean}_{current_datetime}/"
         os.makedirs(directory_path, exist_ok=True)
         # Arguments for organism query script
         args = [
             f"-c /mnt/results/{entry1.get()}/{combobox6.get()}_hours/centrifuge/",
             f"-f {entry3.get()}",
             f"-o {entry4.get()}",
-            f"-d /mnt/reports/{entry1.get()}/organism_query_{entry_4_clean}{current_datetime}/",
+            f"-d /mnt/reports/{entry1.get()}/organism_query_{entry_4_clean}_{current_datetime}/",
             f"-b /mnt/db/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
         ]
     elif entry2_text:
@@ -54,13 +54,13 @@ def compile_and_launch():
         entry_4_clean = original_text.lower().replace(' ', '_').replace("'", "")
         # Output direcotry next to where the epi2me file is
         folder_path = os.path.dirname(entry2.get)
-        directory_path = f"{folder_path}/organism_query_{entry_4_clean}{current_datetime}/"
+        directory_path = f"{folder_path}/organism_query_{entry_4_clean}_{current_datetime}/"
         os.makedirs(directory_path, exist_ok=True)
         args = [
             f"-e {entry2.get()}",
             f"-f {entry3.get()}",
             f"-o {entry4.get()}",
-            f"-d {folder_path}/organism_query_{entry_4_clean}{current_datetime}/",
+            f"-d {folder_path}/organism_query_{entry_4_clean}_{current_datetime}/",
             f"-b /mnt/db/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
         ]
     else:
