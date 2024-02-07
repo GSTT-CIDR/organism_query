@@ -34,12 +34,12 @@ def compile_and_launch():
     if entry1_text and entry2_text:
         messagebox.showerror("Error", "Both report entries are filled. Please fill only one.")
     elif entry1_text:
+        # Clean organism name for output directory
+        original_text = entry4.get()  # Get the text from entry4
+        entry_4_clean = original_text.lower().replace(' ', '_').replace("'", "")
         # Build directory path and create directory
         directory_path = f"/mnt/reports/{entry1.get()}/organism_query_{entry_4_clean}{current_datetime}/"
         os.makedirs(directory_path, exist_ok=True)
-        # Clean organism name for output directory
-        original_text = entry4.get()  # Get the text from entry4
-        entry_4_clean = original_text.lower().replace(' ', '_')
         # Arguments for organism query script
         args = [
             f"-c /mnt/results/{entry1.get()}/{combobox6.get()}_hours/centrifuge/",
@@ -51,7 +51,7 @@ def compile_and_launch():
     elif entry2_text:
         # Clean organism name for output directory
         original_text = entry4.get()  # Get the text from entry4
-        entry_4_clean = original_text.lower().replace(' ', '_')
+        entry_4_clean = original_text.lower().replace(' ', '_').replace("'", "")
         # Output direcotry next to where the epi2me file is
         folder_path = os.path.dirname(entry2.get)
         directory_path = f"{folder_path}/organism_query_{entry_4_clean}{current_datetime}/"
