@@ -95,12 +95,15 @@ label1 = tk.Label(frame1, text="CIDR worklow sample_id")
 label1.pack(side=tk.TOP)
 entry1 = tk.Entry(frame1, width=40)
 entry1.pack(side=tk.LEFT, padx=5)
-label6 = tk.Label(frame1, text="CIDR workflow hour/interval")
+
+# Field 1 - dropdown
+frame6 = tk.Frame(root)
+frame6.pack(pady=5)
+label6 = tk.Label(frame6, text="CIDR workflow hour/interval")
 label6.pack(side=tk.LEFT, padx=5)  # Adjust the side to LEFT to align with the dropdown
 options = ['0.5', '1', '2', '16', '24']
-combobox6 = ttk.Combobox(frame1, values=options, width=37)
+combobox6 = ttk.Combobox(frame6, values=options, width=37)
 combobox6.pack(side=tk.RIGHT, padx=5)  # Adjust according to your layout needs
-
 
 # Field 2
 frame2 = tk.Frame(root)
