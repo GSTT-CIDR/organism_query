@@ -290,6 +290,8 @@ def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir
         file.write(rendered_html)
     subprocess.Popen(["firefox", os.path.join(output_dir, 'organism_report.html')])
 
+
+        
     
 
 ##############################
@@ -352,7 +354,16 @@ def dash_func(output_dir):
     app.run_server()
         
         
-    
+def cleanup(output_dir):
+    path1 = os.path.join(output_dir, blast_results_6.tmp)
+    path2 = os.path.join(output_dir, blast_results.html)
+    path2 = os.path.join(output_dir, blast_results_11.tmp)
+    os.remove(path1)
+    os.remove(path2)
+    os.remove(path3)
+    path4 = os.path.join(output_dir, concatenated_subset_reads.fasta)
+    subprocess.run(['gzip', path4)
+     
     
     
 ascii_art = r''' 
@@ -394,6 +405,7 @@ def main():
     #Building report
     report_build(args.output_dir, args.organism, read_ids, args.blastdb, total_reads, args.fastq_dir, input_format, time_interval)
     dash_func(args.output_dir)
+    cleanup(args.output_dir)
   
 if __name__ == '__main__':
     main()
