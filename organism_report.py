@@ -259,7 +259,7 @@ def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir
 
     #quick stats
     barcode = fastq_dir.split('/')[-1]
-    sample_id = fastq_dir.split('/')[-4]    
+    sample_id = output_dir.split('/')[3]    
 
     report_dict = {"time": 'TEST' + " hrs",
                 "title": "Clinical metagenomics report",
