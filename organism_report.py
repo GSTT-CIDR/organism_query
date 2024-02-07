@@ -40,16 +40,35 @@ def parse_args():
 def ensure_trailing_slash(path):
     return os.path.join(path, '')
 
+import sys
+
 def extract_tax_ids(centrifuge_report, organism_name):
     print(ascii_art)
-    tax_ids = []
+    matches = []
     with open(centrifuge_report, 'r') as file:
         for line in file:
             if organism_name in line:
                 parts = line.strip().split('\t')
-                tax_ids.append(parts[1])  # Assuming Tax_ID is the second column
+                try:
+                    # Assuming the 4th column contains an integer to rank by
+                    rank_value = int(parts[3])
+                    matches.append((line, rank_value))
+                except ValueError:
+                    # Handle the case where conversion to int fails
+                    continue
+    
+    # Sort matches based on the centrifuge score in the 4th column, in descending order
+    matches.sort(key=lambda x: x[1], reverse=True)
+    
+    # If there are more than 10 matches, keep only the top 10
+    top_matches = matches[:10] if len(matches) > 10 else matches
+    
+    # Extract Tax_IDs from the top matches
+    tax_ids = [line[0].strip().split('\t')[1] for line in top_matches]
+    
     sys.stderr.write(f"Identified species: {organism_name}, Tax IDs: {', '.join(tax_ids)}\n")
     return tax_ids
+
 
 
 def extract_read_ids(raw_report, tax_ids, output_dir):
@@ -353,11 +372,13 @@ def dash_func(output_dir):
         return fig
     app.run_server()
         
-        
+def build_log(output_dir):
+
+    
 def cleanup(output_dir):
     path1 = os.path.join(output_dir, blast_results_6.tmp)
     path2 = os.path.join(output_dir, blast_results.html)
-    path2 = os.path.join(output_dir, blast_results_11.tmp)
+    path3 = os.path.join(output_dir, blast_results_11.tmp)
     os.remove(path1)
     os.remove(path2)
     os.remove(path3)
