@@ -362,7 +362,7 @@ def cleanup(output_dir):
     os.remove(path2)
     os.remove(path3)
     path4 = os.path.join(output_dir, concatenated_subset_reads.fasta)
-    subprocess.run(['gzip', path4)
+    subprocess.run(['gzip', path4])
      
     
     
