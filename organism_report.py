@@ -57,7 +57,7 @@ def extract_tax_ids(centrifuge_report, organism_name):
                     # Handle the case where conversion to int fails
                     continue
     
-    # Sort matches based on the centrifuge score in the 4th column, in descending order
+    # Sort matches based on the integer in the 4th column, in descending order
     matches.sort(key=lambda x: x[1], reverse=True)
     
     # If there are more than 10 matches, keep only the top 10
@@ -371,8 +371,6 @@ def dash_func(output_dir):
         fig.update_layout(xaxis_title='Percent Identity (%)', yaxis_title='E-value (log scale)')
         return fig
     app.run_server()
-        
-def build_log(output_dir):
 
     
 def cleanup(output_dir):
