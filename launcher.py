@@ -37,7 +37,7 @@ def compile_and_launch():
         directory_path = f"/mnt/reports/{entry1.get()}/{entry_4_clean}{current_datetime}/"
         os.makedirs(directory_path, exist_ok=True)
         args = [
-            f"-c /mnt/results/{entry1.get()}/{combobox6.get()}_hours/centrifuge/centrifuge_raw.tsv",
+            f"-c /mnt/results/{entry1.get()}/{combobox6.get()}_hours/centrifuge/",
             f"-f {entry3.get()}",
             f"-o {entry4.get()}",
             f"-d /mnt/reports/{entry1.get()}/organism_query_{entry_4_clean}{current_datetime}/",
@@ -100,7 +100,7 @@ entry1.pack(side=tk.LEFT, padx=5)
 frame6 = tk.Frame(root)
 frame6.pack(pady=5)
 label6 = tk.Label(frame6, text="CIDR workflow hour/interval")
-label6.pack(side=tk.LEFT, padx=5)  # Adjust the side to LEFT to align with the dropdown
+label6.pack(side=tk.TOP, padx=5)  # Adjust the side to LEFT to align with the dropdown
 options = ['0.5', '1', '2', '16', '24']
 combobox6 = ttk.Combobox(frame6, values=options, width=37)
 combobox6.pack(side=tk.RIGHT, padx=5)  # Adjust according to your layout needs
