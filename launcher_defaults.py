@@ -38,15 +38,15 @@ def compile_and_launch():
         original_text = entry4.get()  # Get the text from entry4
         entry_4_clean = original_text.lower().replace(' ', '_').replace("'", "")
         # Build directory path and create directory
-        directory_path = f"/mnt/reports/{entry1.get()}/organism_query_{entry_4_clean}_{current_datetime}/"
+        directory_path = f"{entry5.get()}/organism_query_{entry_4_clean}_{current_datetime}/"
         os.makedirs(directory_path, exist_ok=True)
         # Arguments for organism query script
         args = [
-            f"-c /mnt/results/{entry1.get()}/{combobox6.get()}_hours/centrifuge/",
+            f"-c {entry1.get()}/",
             f"-f {entry3.get()}",
             f"-o {entry4.get()}",
-            f"-d /mnt/reports/{entry1.get()}/organism_query_{entry_4_clean}_{current_datetime}/",
-            f"-b /mnt/db/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
+            f"-d {directory_path}",
+            f"-b {entry7.get()}/{dropdown_var.get()}"  # Add the selected
         ]
     elif entry2_text:
         # Clean organism name for output directory
@@ -54,20 +54,22 @@ def compile_and_launch():
         entry_4_clean = original_text.lower().replace(' ', '_').replace("'", "")
         # Output direcotry next to where the epi2me file is
         folder_path = os.path.dirname(entry2.get)
-        directory_path = f"{folder_path}/organism_query_{entry_4_clean}_{current_datetime}/"
+        directory_path = f"{entry5.get()}/organism_query_{entry_4_clean}_{current_datetime}/"
         os.makedirs(directory_path, exist_ok=True)
         args = [
             f"-e {entry2.get()}",
             f"-f {entry3.get()}",
             f"-o {entry4.get()}",
-            f"-d {folder_path}/organism_query_{entry_4_clean}_{current_datetime}/",
-            f"-b /mnt/db/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
+            f"-d {directory_path}",
+            f"-b {entry7.get()}/{dropdown_var.get()}"  # Add the selected
         ]
     else:
         messagebox.showinfo("Result", "Query fields incomplete.")
     # Form the final command to be executed
     command = f"python organism_report.py {' '.join(args)}"
     # Execute the command here, e.g., using os.system or subprocess.run
+    os.environ['NCBI_CONFIG_OVERRIDES'] = f"TRUE"
+    os.environ['BLASTDB'] = f"{entry7.get()}"
     subprocess.run(command, shell=True)
 
 
@@ -98,19 +100,21 @@ description3.pack()
 # Field 1
 frame1 = tk.Frame(root)
 frame1.pack(pady=5)
-label1 = tk.Label(frame1, text="CIDR worklow sample_id")
+label1 = tk.Label(frame1, text="CIDR 'workflow/results/sampleID/XXhour/centrifuge/' folder")
 label1.pack(side=tk.TOP)
 entry1 = tk.Entry(frame1, width=40)
 entry1.pack(side=tk.LEFT, padx=5)
+buttton1 = tk.Button(frame1, text="Choose directory", command=lambda: choose_directory(entry1))
+buttton1.pack(side=tk.LEFT)
 
 # Field 1 - dropdown
-frame6 = tk.Frame(root)
-frame6.pack(pady=5)
-label6 = tk.Label(frame6, text="CIDR workflow hour/interval")
-label6.pack(side=tk.TOP, padx=5)  # Adjust the side to LEFT to align with the dropdown
-options = ['0.5', '1', '2', '16', '24']
-combobox6 = ttk.Combobox(frame6, values=options, width=37)
-combobox6.pack(side=tk.RIGHT, padx=5)  # Adjust according to your layout needs
+#frame6 = tk.Frame(root)
+#frame6.pack(pady=5)
+#label6 = tk.Label(frame6, text="CIDR workflow hour/interval")
+#label6.pack(side=tk.TOP, padx=5)  # Adjust the side to LEFT to align #with the dropdown
+#options = ['0.5', '1', '2', '16', '24']
+#combobox6 = ttk.Combobox(frame6, values=options, width=37)
+#combobox6.pack(side=tk.RIGHT, padx=5)  # Adjust according to your layout needs
 
 # Field 2
 frame2 = tk.Frame(root)
@@ -140,6 +144,16 @@ label4.pack(side=tk.TOP)
 entry4 = tk.Entry(frame4, width=40)
 entry4.pack(side=tk.LEFT, padx=5)
 
+# Field 7
+frame7 = tk.Frame(root)
+frame7.pack(padx=10)
+label7 = tk.Label(frame7, text="BLASTDB directory")
+label7.pack(side=tk.TOP)
+entry7 = tk.Entry(frame7, width=40)
+entry7.pack(side=tk.LEFT, padx=5)
+buttton7 = tk.Button(frame7, text="Choose directory", command=lambda: choose_directory(entry7))
+buttton7.pack(side=tk.LEFT)
+
 # Dropdown (Combobox) for multiple choice input
 frame_dropdown = tk.Frame(root)
 frame_dropdown.pack(pady=5)
@@ -153,16 +167,15 @@ dropdown['values'] = ('nt', 'refseq', 'ref_prok_rep_genomes', 'ref_viruses_rep_g
 dropdown.current(0)  # Set the default value
 dropdown.pack(side=tk.LEFT)
 
-
 # Field 5
-#frame5 = tk.Frame(root)
-#frame5.pack(padx=10)
-#label5 = tk.Label(frame5, text="Output directory")
-#label5.pack(side=tk.TOP)
-#entry5 = tk.Entry(frame5, width=40)
-#entry5.pack(side=tk.LEFT, padx=5)
-#buttton5 = tk.Button(frame5, text="Choose output directory", command=lambda: choose_directory(entry5))
-#buttton5.pack(side=tk.LEFT)
+frame5 = tk.Frame(root)
+frame5.pack(padx=10)
+label5 = tk.Label(frame5, text="Output directory")
+label5.pack(side=tk.TOP)
+entry5 = tk.Entry(frame5, width=40)
+entry5.pack(side=tk.LEFT, padx=5)
+buttton5 = tk.Button(frame5, text="Choose output directory", command=lambda: choose_directory(entry5))
+buttton5.pack(side=tk.LEFT)
 
 
 # 'Launch Script' button
