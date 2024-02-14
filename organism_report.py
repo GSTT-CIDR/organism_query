@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-#read parsing
 import argparse
 import os
 import gzip
@@ -9,12 +8,21 @@ import sys
 import pandas as pd
 import csv
 from collections import Counter
-#interactivate plotting
+from datetime import datetime
+
+# Taxid parsing
+import pytaxonkit
+from tabulate import tabulate
+
+# Report and Plotly control
+from dash import html
+import requests
+from flask import request
 import plotly.express as px
 import dash
 from dash import html, dcc, Input, Output
 from jinja2 import Environment, FileSystemLoader
-from datetime import datetime
+import threading
 
 #Argument parsing
 def parse_args():
@@ -50,6 +58,44 @@ def extract_tax_ids(centrifuge_report, organism_name):
                 tax_ids.append(parts[1])  # Assuming Tax_ID is the second column
     sys.stderr.write(f"Identified species: {organism_name}, Tax IDs: {', '.join(tax_ids)}\n")
     return tax_ids
+
+def get_unique_children_taxids_and_names(taxids):
+    """
+    Calls pytaxonkit to get children taxonomic IDs and names for each taxonomic ID in the input list,
+    including the query level itself. Ensures that each taxonomic ID and name is unique.
+    
+    Parameters:
+    - taxids (List[int]): A list of taxonomic IDs.
+    
+    Returns:
+    - List[int]: A list of unique children taxonomic IDs including the query level.
+    - List[str]: A list of unique names corresponding to the taxonomic IDs.
+    """
+    taxid_name_map = {}
+
+    for taxid in taxids:
+        # Pytaxonkit list
+        pytaxonkit_output = pytaxonkit.list([taxid], raw=True)
+
+        def extract_ids_and_names(nested_dict):
+            for key, value in nested_dict.items():
+                # Extract taxonomic ID and name
+                split_key = key.split(' ', 1)  # Splitting at the first space to separate taxid from the rest
+                taxid = str(split_key[0])
+                name = split_key[1] if len(split_key) > 1 else "No name"
+                taxid_name_map[taxid] = name  # This ensures uniqueness of taxid
+                # Recurse if there are more levels
+                if isinstance(value, dict) and value:
+                    extract_ids_and_names(value)
+
+        # Starting point for extraction
+        extract_ids_and_names(pytaxonkit_output)
+
+    # Convert the dictionary back into two lists
+    unique_taxids = list(taxid_name_map.keys())
+    unique_names = list(taxid_name_map.values())
+
+    return unique_taxids, unique_names
 
 
 def extract_read_ids(raw_report, tax_ids, output_dir):
@@ -303,11 +349,7 @@ def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir
     # Output the rendered HTML to a file
     with open(os.path.join(output_dir, 'organism_report.html'), 'w', encoding='utf-8') as file:
         file.write(rendered_html)
-    subprocess.Popen(["firefox", os.path.join(output_dir, 'organism_report.html')])
 
-
-        
-    
 
 ##############################
 ##Dash and plotly function####
@@ -366,19 +408,45 @@ def dash_func(output_dir):
                         hover_data=['Scientific Name', 'Alignment Length'], log_y=True)
         fig.update_layout(xaxis_title='Percent Identity (%)', yaxis_title='E-value (log scale)')
         return fig
-    app.run_server()
 
     
+    @app.server.route('/shutdown', methods=['POST'])
+    def shutdown():
+        func = request.environ.get('werkzeug.server.shutdown')
+        if func is None:
+            raise RuntimeError('Not running with the Werkzeug Server')
+        func()
+        return 'Server shutting down...'
+
+def run_dash_in_thread(output_dir):
+    def run_dash():
+        dash_func(output_dir)
+    dash_thread = threading.Thread(target=run_dash)
+    dash_thread.start()  
+
 def cleanup(output_dir):
-    path1 = os.path.join(output_dir, blast_results_6.tmp)
-    path2 = os.path.join(output_dir, blast_results.html)
-    path3 = os.path.join(output_dir, blast_results_11.tmp)
+    path1 = os.path.join(output_dir, 'blast_results_6.tmp')
+    path2 = os.path.join(output_dir, 'blast_results.html')
+    path3 = os.path.join(output_dir, 'blast_results_11.tmp')
     os.remove(path1)
     os.remove(path2)
     os.remove(path3)
-    path4 = os.path.join(output_dir, concatenated_subset_reads.fasta)
+    path4 = os.path.join(output_dir, 'concatenated_subset_reads.fasta')
     subprocess.run(['gzip', path4])
-     
+
+def view_report(output_dir):
+    process = subprocess.Popen(["firefox", os.path.join(output_dir, 'organism_report.html')])
+    # Wait for the Firefox process to terminate
+    try:
+        process.wait()
+    except KeyboardInterrupt:
+        # Handle the case where the script is interrupted by the user
+        print("Firefox closed or script interrupted")
+    
+    # Once Firefox is closed, call the cleanup function
+    requests.post('http://localhost:8050/shutdown')
+    cleanup(output_dir)
+
     
     
 ascii_art = r''' 
@@ -408,7 +476,10 @@ def main():
         time_interval = raw_report.split('/')[-3]
         centrifuge_report = os.path.join(args.centrifuge_report_dir, 'centrifuge_report.tsv')
         tax_ids = extract_tax_ids(centrifuge_report, args.organism)
-        read_ids = extract_read_ids(raw_report, tax_ids, args.output_dir)
+        unique_taxids, unique_names = get_unique_children_taxids_and_names(tax_ids)
+        taxid_name_pairs = list(zip(unique_taxids, unique_names))
+        print(tabulate(taxid_name_pairs, headers=['Taxonomic ID', 'Name']))
+        read_ids = extract_read_ids(raw_report, unique_taxids, args.output_dir)
     else:
         print("Error: No workflow analysis outputs were given.")
         sys.exit(1)
@@ -419,8 +490,11 @@ def main():
     run_parser(subset_reads, args.output_dir, args.blastdb )
     #Building report
     report_build(args.output_dir, args.organism, read_ids, args.blastdb, total_reads, args.fastq_dir, input_format, time_interval)
-    dash_func(args.output_dir)
+    run_dash_in_thread(args.output_dir)  # Start Dash server in a separate thread
+    view_report(args.output_dir)  
     cleanup(args.output_dir)
+    
+    
   
 if __name__ == '__main__':
     main()

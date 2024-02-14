@@ -25,6 +25,12 @@ def choose_file(entry):
 
 blast_db_dir = ""
 
+def get_entry4_with_quotes():
+    """
+    Retrieves the text from entry4 and encases it in single quotes.
+    """
+    return "'" + entry4.get() + "'"
+
 def compile_and_launch():
     
     # Determine whether EPI2ME or CIDR input is used
@@ -35,7 +41,7 @@ def compile_and_launch():
         messagebox.showerror("Error", "Both report entries are filled. Please fill only one.")
     elif entry1_text:
         # Clean organism name for output directory
-        original_text = entry4.get()  # Get the text from entry4
+        original_text = get_entry4_with_quotes()  # Get the text from entry4
         entry_4_clean = original_text.lower().replace(' ', '_').replace("'", "")
         # Build directory path and create directory
         directory_path = f"{entry5.get()}/organism_query_{entry_4_clean}_{current_datetime}/"
@@ -44,13 +50,13 @@ def compile_and_launch():
         args = [
             f"-c {entry1.get()}/",
             f"-f {entry3.get()}",
-            f"-o {entry4.get()}",
+            f"-o {get_entry4_with_quotes()}",
             f"-d {directory_path}",
             f"-b {entry7.get()}/{dropdown_var.get()}"  # Add the selected
         ]
     elif entry2_text:
         # Clean organism name for output directory
-        original_text = entry4.get()  # Get the text from entry4
+        original_text = get_entry4_with_quotes()  # Get the text from entry4
         entry_4_clean = original_text.lower().replace(' ', '_').replace("'", "")
         # Output direcotry next to where the epi2me file is
         folder_path = os.path.dirname(entry2.get)
@@ -59,7 +65,7 @@ def compile_and_launch():
         args = [
             f"-e {entry2.get()}",
             f"-f {entry3.get()}",
-            f"-o {entry4.get()}",
+            f"-o {get_entry4_with_quotes()}",
             f"-d {directory_path}",
             f"-b {entry7.get()}/{dropdown_var.get()}"  # Add the selected
         ]
@@ -136,7 +142,7 @@ entry3.pack(side=tk.LEFT, padx=5)
 buttton3 = tk.Button(frame3, text="Choose directory", command=lambda: choose_directory(entry3))
 buttton3.pack(side=tk.LEFT)
 
-#Field 4
+# Your existing setup for field4
 frame4 = tk.Frame(root)
 frame4.pack(padx=10)
 label4 = tk.Label(frame4, text="Species name")

@@ -25,7 +25,11 @@ def choose_file(entry):
         entry.delete(0, tk.END)
         entry.insert(0, filepath)
 
-
+def get_entry4_with_quotes():
+    """
+    Retrieves the text from entry4 and encases it in single quotes.
+    """
+    return "'" + entry4.get() + "'"
 
 blast_db_dir = ""
 
@@ -39,7 +43,7 @@ def compile_and_launch():
         messagebox.showerror("Error", "Both report entries are filled. Please fill only one.")
     elif entry1_text:
         # Clean organism name for output directory
-        original_text = entry4.get()  # Get the text from entry4
+        original_text = get_entry4_with_quotes()  # Get the text from entry4
         entry_4_clean = original_text.lower().replace(' ', '_').replace("'", "")
         # Build directory path and create directory
         directory_path = f"/mnt/reports/{entry1.get()}/organism_query_{entry_4_clean}_{current_datetime}/"
@@ -48,13 +52,13 @@ def compile_and_launch():
         args = [
             f"-c /mnt/results/{entry1.get()}/{combobox6.get()}_hours/centrifuge/",
             f"-f {entry3.get()}",
-            f"-o {entry4.get()}",
+            f"-o {get_entry4_with_quotes()}",
             f"-d /mnt/reports/{entry1.get()}/organism_query_{entry_4_clean}_{current_datetime}/",
             f"-b /mnt/db/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
         ]
     elif entry2_text:
         # Clean organism name for output directory
-        original_text = entry4.get()  # Get the text from entry4
+        original_text = get_entry4_with_quotes()  # Get the text from entry4
         entry_4_clean = original_text.lower().replace(' ', '_').replace("'", "")
         # Output direcotry next to where the epi2me file is
         folder_path = os.path.dirname(entry2.get)
@@ -63,7 +67,7 @@ def compile_and_launch():
         args = [
             f"-e {entry2.get()}",
             f"-f {entry3.get()}",
-            f"-o {entry4.get()}",
+            f"-o {get_entry4_with_quotes()}",
             f"-d {folder_path}/organism_query_{entry_4_clean}_{current_datetime}/",
             f"-b /mnt/db/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
         ]
@@ -137,7 +141,7 @@ entry3.pack(side=tk.LEFT, padx=5)
 buttton3 = tk.Button(frame3, text="Choose directory", command=lambda: choose_directory_fastq(entry3))
 buttton3.pack(side=tk.LEFT)
 
-#Field 4
+# Your existing setup for field4
 frame4 = tk.Frame(root)
 frame4.pack(padx=10)
 label4 = tk.Label(frame4, text="Species name")
