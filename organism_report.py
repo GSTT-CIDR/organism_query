@@ -45,7 +45,7 @@ def ensure_trailing_slash(path):
     return os.path.join(path, '')
 
 def extract_tax_ids(centrifuge_report, organism_name):
-    print(ascii_art)
+    print(ascii_art, flush=True)
     tax_ids = []
     with open(centrifuge_report, 'r') as file:
         for line in file:
@@ -475,10 +475,11 @@ def main():
         tax_ids = extract_tax_ids(centrifuge_report, args.organism)
         unique_taxids, unique_names = get_unique_children_taxids_and_names(tax_ids)
         taxid_name_pairs = list(zip(unique_taxids, unique_names))
-        print(tabulate(taxid_name_pairs, headers=['Taxonomic ID', 'Name']))
+        print("Search widened for the following taxa:", flush=True)
+        print(tabulate(taxid_name_pairs, headers=['Taxonomic ID', 'Name']), flush=True)
         read_ids = extract_read_ids(raw_report, unique_taxids, args.output_dir)
     else:
-        print("Error: No workflow analysis outputs were given.")
+        print("Error: No workflow analysis outputs were given.", flush=True)
         sys.exit(1)
     total_reads = extract_reads(args.fastq_dir, read_ids, args.output_dir)    
     subset_reads = os.path.join(args.output_dir, 'concatenated_subset_reads.fastq')

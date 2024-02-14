@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox, scrolledtext
 from tkinter import ttk  # For combobox
 from tkinter import Tk, Label
 from tkinter import filedialog
@@ -7,8 +8,13 @@ from PIL import Image, ImageTk
 import subprocess
 import datetime
 import os
+from subprocess import Popen, PIPE, STDOUT
+from threading import Thread
 
 current_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
+# For initialising the subprocess state
+process = None
+
 
 # Function to choose a directory
 def choose_directory(entry):
@@ -32,7 +38,7 @@ def get_entry4_with_quotes():
     return "'" + entry4.get() + "'"
 
 def compile_and_launch():
-    
+    global process  # Make the process global to access it later for termination
     # Determine whether EPI2ME or CIDR input is used
     entry1_text = entry1.get()
     entry2_text = entry2.get()
@@ -72,12 +78,28 @@ def compile_and_launch():
     else:
         messagebox.showinfo("Result", "Query fields incomplete.")
     # Form the final command to be executed
-    command = f"python organism_report.py {' '.join(args)}"
+    # Have added here '-u' to allow for terminal output in tkinter
+    command = f"python -u organism_report.py {' '.join(args)}"
     # Execute the command here, e.g., using os.system or subprocess.run
     os.environ['NCBI_CONFIG_OVERRIDES'] = f"TRUE"
     os.environ['BLASTDB'] = f"{entry7.get()}"
-    subprocess.run(command, shell=True)
+    # Modified part to execute command and capture output
+    process = Popen(command, stdout=PIPE, stderr=STDOUT, shell=True, text=True, bufsize=1, universal_newlines=True)
+    Thread(target=read_output, args=(process, terminal_output), daemon=True).start()
 
+
+def read_output(process, output_widget):
+    """Read and display both stdout and stderr from the process."""
+    for line in iter(process.stdout.readline, ''):
+        output_widget.insert(tk.END, line)
+        output_widget.see(tk.END)
+    process.stdout.close()
+
+def on_closing():
+    global process
+    if process is not None and process.poll() is None:
+        process.terminate()
+    root.destroy()
 
 # Create main window
 root = tk.Tk()
@@ -187,6 +209,13 @@ buttton5.pack(side=tk.LEFT)
 # 'Launch Script' button
 launch_button = tk.Button(root, text="Launch Script", command=compile_and_launch)
 launch_button.pack(pady=10)
+
+# Adding a terminal-like output area at the bottom
+terminal_output = scrolledtext.ScrolledText(root, height=20)
+terminal_output.pack(fill=tk.BOTH, expand=True)
+
+# Ensure the subprocess is terminated when the window is closed
+root.protocol("WM_DELETE_WINDOW", on_closing)
 
 # Run the main application loop
 root.mainloop()
