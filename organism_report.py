@@ -1,28 +1,24 @@
 #!/usr/bin/env python3
 
+#read parsing
 import argparse
 import os
+import sys
 import gzip
 import subprocess
 import sys
 import pandas as pd
 import csv
 from collections import Counter
-from datetime import datetime
-
-# Taxid parsing
-import pytaxonkit
-from tabulate import tabulate
-
-# Report and Plotly control
-from dash import html
-import requests
-from flask import request
+from colorama import init, Fore, Style
+#interactivate plotting
 import plotly.express as px
 import dash
 from dash import html, dcc, Input, Output
 from jinja2 import Environment, FileSystemLoader
-import threading
+from datetime import datetime
+import pytaxonkit
+from tabulate import tabulate
 
 #Argument parsing
 def parse_args():
@@ -56,7 +52,10 @@ def extract_tax_ids(centrifuge_report, organism_name):
             if organism_name in line:
                 parts = line.strip().split('\t')
                 tax_ids.append(parts[1])  # Assuming Tax_ID is the second column
-    sys.stderr.write(f"Identified species: {organism_name}, Tax IDs: {', '.join(tax_ids)}\n")
+    if not tax_ids:  # Check if tax_ids list is empty
+        sys.stderr.write(f"{Fore.RED}Error: No tax IDs found for {organism_name}\n")
+        sys.exit(1)  # Exit the script with an error status code, e.g., 1
+    sys.stderr.write(f"{Fore.GREEN}Identified species: {organism_name}, Tax IDs: {', '.join(tax_ids)}\n")
     return tax_ids
 
 def get_unique_children_taxids_and_names(taxids):
@@ -110,6 +109,11 @@ def extract_read_ids(raw_report, tax_ids, output_dir):
                 score = int(parts[3])  # Assuming score is an integer in the fourth column
                 matched_reads.append((read_id, score))
     
+    # Check if no matched reads were found
+    if not matched_reads:
+        sys.stderr.write(f"{Fore.RED}Error: No read IDs found matching the given Tax IDs\n")
+        sys.exit(1)  # Exit the script with an error status code, e.g., 1
+    
     # Sort matched reads by score in descending order and select the top 10
     top_reads = sorted(matched_reads, key=lambda x: x[1], reverse=True)[:10]
     
@@ -123,9 +127,10 @@ def extract_read_ids(raw_report, tax_ids, output_dir):
             read_count += 1
     
     # Output the number of reads matched with TaxIDs
-    sys.stderr.write(f"Number of reads matched with TaxIDs (top 10 by score): {read_count}\n")
+    sys.stderr.write(f"{Fore.GREEN}Number of reads matched with TaxIDs (top 10 by score): {read_count}\n")
     
     return read_ids
+
 
 
 
@@ -148,11 +153,9 @@ def extract_read_ids_epi2me(epi2me_report, organism, output_dir):
                     output_file.write(read_id + '\n')
                     read_count += 1
 
-    sys.stderr.write(f"Number of reads matched with '{organism}': {read_count}\n")
+    sys.stderr.write(f"{Fore.GREEN}Number of reads matched with '{organism}': {read_count}\n")
 #    print(read_ids)
     return read_ids
-
-
 
 
 def extract_reads(fastq_dir, read_ids, output_dir):
@@ -185,20 +188,36 @@ def extract_reads(fastq_dir, read_ids, output_dir):
                                 next(infile)
                                 next(infile)
 
-    # Print summary of found barcodes
+    # After processing, check if no target reads were found
+    if total_target_reads == 0:
+        sys.stderr.write(f"{Fore.RED}Error: No target reads found in the provided FASTQ files.\n")
+        sys.exit(1)  # Exit the script with an error status code, e.g., 1
+
+    # Print summary of found barcodes and total reads processed
     if found_barcodes:
         sys.stderr.write(f"Summary of barcodes found: {', '.join(sorted(found_barcodes))}\n")
     sys.stderr.write(f"Total FASTQ files processed: {total_files}\n")
-    sys.stderr.write(f"Total reads extracted and converted to FASTA: {total_target_reads}\n")
+    sys.stderr.write(f"{Fore.GREEN}Total reads extracted and converted to FASTA: {total_target_reads}\n")
     return total_reads
+
 
 def run_blast(input_file, output_dir, blastdb):
     sys.stderr.write("BLAST analysis started...\n")
     cmd = [
-        'blastn','-evalue', '1e-5','-max_target_seqs', '100', '-max_hsps', '1', '-outfmt', '11', '-query', output_dir + 'concatenated_subset_reads.fasta', '-db', blastdb, '-out', os.path.join(output_dir, 'blast_results_11.tmp'), '-num_threads', '20'
+        'blastn', '-evalue', '1e-5', '-max_target_seqs', '100', '-max_hsps', '1', '-outfmt', '11',
+        '-query', os.path.join(output_dir, 'concatenated_subset_reads.fasta'),
+        '-db', blastdb, '-out', os.path.join(output_dir, 'blast_results_11.tmp'), '-num_threads', '20'
     ]
-    subprocess.run(cmd)
-    sys.stderr.write("BLAST analysis completed.\n")
+    
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    
+    if result.returncode != 0:
+        # If BLAST encounters an error, print the error message and exit
+        sys.stderr.write(f"{Fore.RED}Error running BLAST: {result.stderr}{Style.RESET_ALL}\n")
+        sys.exit(1)
+    
+    sys.stderr.write(f"{Fore.GREEN}BLAST analysis completed.{Style.RESET_ALL}\n")
+
     
 
 def run_parser(input_file, output_dir, blastdb):
@@ -349,7 +368,11 @@ def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir
     # Output the rendered HTML to a file
     with open(os.path.join(output_dir, 'organism_report.html'), 'w', encoding='utf-8') as file:
         file.write(rendered_html)
+    subprocess.Popen(["firefox", os.path.join(output_dir, 'organism_report.html')])
 
+
+        
+    
 
 ##############################
 ##Dash and plotly function####
@@ -408,45 +431,17 @@ def dash_func(output_dir):
                         hover_data=['Scientific Name', 'Alignment Length'], log_y=True)
         fig.update_layout(xaxis_title='Percent Identity (%)', yaxis_title='E-value (log scale)')
         return fig
+    app.run_server()
 
     
-    @app.server.route('/shutdown', methods=['POST'])
-    def shutdown():
-        func = request.environ.get('werkzeug.server.shutdown')
-        if func is None:
-            raise RuntimeError('Not running with the Werkzeug Server')
-        func()
-        return 'Server shutting down...'
-
-def run_dash_in_thread(output_dir):
-    def run_dash():
-        dash_func(output_dir)
-    dash_thread = threading.Thread(target=run_dash)
-    dash_thread.start()  
-
 def cleanup(output_dir):
-    path1 = os.path.join(output_dir, 'blast_results_6.tmp')
     path2 = os.path.join(output_dir, 'blast_results.html')
     path3 = os.path.join(output_dir, 'blast_results_11.tmp')
-    os.remove(path1)
     os.remove(path2)
     os.remove(path3)
     path4 = os.path.join(output_dir, 'concatenated_subset_reads.fasta')
     subprocess.run(['gzip', path4])
-
-def view_report(output_dir):
-    process = subprocess.Popen(["firefox", os.path.join(output_dir, 'organism_report.html')])
-    # Wait for the Firefox process to terminate
-    try:
-        process.wait()
-    except KeyboardInterrupt:
-        # Handle the case where the script is interrupted by the user
-        print("Firefox closed or script interrupted")
-    
-    # Once Firefox is closed, call the cleanup function
-    requests.post('http://localhost:8050/shutdown')
-    cleanup(output_dir)
-
+     
     
     
 ascii_art = r''' 
@@ -457,6 +452,8 @@ ascii_art = r'''
             \____|____/ |_|   |_|      \____|___|____/|_| \_\
 '''
 
+# Initialise text colouring 
+init()  # Initialize Colorama
 
 def main():
     # Parsing arguments
@@ -490,11 +487,9 @@ def main():
     run_parser(subset_reads, args.output_dir, args.blastdb )
     #Building report
     report_build(args.output_dir, args.organism, read_ids, args.blastdb, total_reads, args.fastq_dir, input_format, time_interval)
-    run_dash_in_thread(args.output_dir)  # Start Dash server in a separate thread
-    view_report(args.output_dir)  
     cleanup(args.output_dir)
-    
-    
+    dash_func(args.output_dir)
+
   
 if __name__ == '__main__':
     main()
