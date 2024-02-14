@@ -15,7 +15,6 @@ current_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
 # For initialising the subprocess state
 process = None
 
-
 # Function to choose a directory
 def choose_directory(entry):
     directory = filedialog.askdirectory()
@@ -29,13 +28,13 @@ def choose_file(entry):
         entry.delete(0, tk.END)
         entry.insert(0, filepath)
 
-blast_db_dir = ""
-
 def get_entry4_with_quotes():
     """
     Retrieves the text from entry4 and encases it in single quotes.
     """
     return "'" + entry4.get() + "'"
+
+blast_db_dir = ""
 
 def compile_and_launch():
     global process  # Make the process global to access it later for termination
@@ -81,6 +80,7 @@ def compile_and_launch():
     # Have added here '-u' to allow for terminal output in tkinter
     command = f"python -u organism_report.py {' '.join(args)}"
     # Execute the command here, e.g., using os.system or subprocess.run
+    # For outside of the container only - points to the blast DB and the taxamap
     os.environ['NCBI_CONFIG_OVERRIDES'] = f"TRUE"
     os.environ['BLASTDB'] = f"{entry7.get()}"
     # Modified part to execute command and capture output
