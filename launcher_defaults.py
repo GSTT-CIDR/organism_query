@@ -80,7 +80,7 @@ def compile_and_launch():
     # Have added here '-u' to allow for terminal output in tkinter
     command = f"python -u organism_report.py {' '.join(args)}"
     # Execute the command here, e.g., using os.system or subprocess.run
-    # For outside of the container only - points to the blast DB and the taxamap
+    # Points to the blast DB and the taxamap
     os.environ['NCBI_CONFIG_OVERRIDES'] = f"TRUE"
     os.environ['BLASTDB'] = f"{entry7.get()}"
     # Modified part to execute command and capture output

@@ -1,5 +1,0 @@
-; Start the section for BLAST configuration
-[BLAST]
-; Specifies the path where BLAST databases are installed
-BLASTDB=/mnt/db/blastdb
-; end of file
