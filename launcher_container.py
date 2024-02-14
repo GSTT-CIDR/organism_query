@@ -149,16 +149,6 @@ label4.pack(side=tk.TOP)
 entry4 = tk.Entry(frame4, width=40)
 entry4.pack(side=tk.LEFT, padx=5)
 
-# Field 7
-frame7 = tk.Frame(root)
-frame7.pack(padx=10)
-label7 = tk.Label(frame7, text="BLASTDB directory")
-label7.pack(side=tk.TOP)
-entry7 = tk.Entry(frame7, width=40)
-entry7.pack(side=tk.LEFT, padx=5)
-buttton7 = tk.Button(frame7, text="Choose directory", command=lambda: choose_directory(entry7))
-buttton7.pack(side=tk.LEFT)
-
 # Dropdown (Combobox) for multiple choice input
 frame_dropdown = tk.Frame(root)
 frame_dropdown.pack(pady=5)
@@ -187,6 +177,13 @@ dropdown.pack(side=tk.LEFT)
 # 'Launch Script' button
 launch_button = tk.Button(root, text="Launch Script", command=compile_and_launch)
 launch_button.pack(pady=10)
+
+# Adding a terminal-like output area at the bottom
+terminal_output = scrolledtext.ScrolledText(root, height=20)
+terminal_output.pack(fill=tk.BOTH, expand=True)
+
+# Ensure the subprocess is terminated when the window is closed
+root.protocol("WM_DELETE_WINDOW", on_closing)
 
 # Run the main application loop
 root.mainloop()
