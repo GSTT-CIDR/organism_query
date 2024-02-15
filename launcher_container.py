@@ -16,7 +16,7 @@ current_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
 process = None
 
 # Function to choose a directory with a default path
-def choose_directory_fastq(entry, default_path='/mnt/data/'):
+def choose_directory_fastq(entry, default_path='/data/'):
     # Use the 'initialdir' option to open the dialog in the default path
     directory = filedialog.askdirectory(initialdir=default_path)
     entry.delete(0, tk.END)
