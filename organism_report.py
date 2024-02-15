@@ -74,7 +74,7 @@ def get_unique_children_taxids_and_names(taxids):
 
     for taxid in taxids:
         # Pytaxonkit list
-        pytaxonkit_output = pytaxonkit.list([taxid], raw=True)
+        pytaxonkit_output = pytaxonkit.list([taxid], raw=True, , data_dir="/taxonkit)
 
         def extract_ids_and_names(nested_dict):
             for key, value in nested_dict.items():
