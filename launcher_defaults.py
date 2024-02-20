@@ -64,7 +64,7 @@ def compile_and_launch():
         original_text = get_entry4_with_quotes()  # Get the text from entry4
         entry_4_clean = original_text.lower().replace(' ', '_').replace("'", "")
         # Output direcotry next to where the epi2me file is
-        folder_path = os.path.dirname(entry2.get)
+        #folder_path = os.path.dirname(entry2_text)
         directory_path = f"{entry5.get()}/organism_query_{entry_4_clean}_{current_datetime}/"
         os.makedirs(directory_path, exist_ok=True)
         args = [
