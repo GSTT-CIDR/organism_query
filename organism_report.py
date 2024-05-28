@@ -167,14 +167,21 @@ def extract_reads(fastq_dir, read_ids, output_dir):
 
     with open(os.path.join(output_dir, 'concatenated_subset_reads.fasta'), 'w') as outfile:
         for fastq_file in os.listdir(fastq_dir):
-            if fastq_file.endswith('.fastq.gz'):
+            if fastq_file.endswith('.fastq.gz') or fastq_file.endswith('.fastq'):
                 total_files += 1
                 # Search for 'barcode' in the filename
                 for part in fastq_file.split('_'):
                     if part.startswith('barcode'):
                         found_barcodes.add(part)
 
-                with gzip.open(os.path.join(fastq_dir, fastq_file), 'rt') as infile:
+                if fastq_file.endswith('.fastq.gz'):
+                    open_func = gzip.open
+                    mode = 'rt'
+                else:
+                    open_func = open
+                    mode = 'r'
+                
+                with open_func(os.path.join(fastq_dir, fastq_file), mode) as infile:
                     for line in infile:
                         total_reads += 1
                         if line.startswith('@'):
@@ -199,6 +206,7 @@ def extract_reads(fastq_dir, read_ids, output_dir):
     sys.stderr.write(f"Total FASTQ files processed: {total_files}\n")
     sys.stderr.write(f"{Fore.GREEN}Total reads extracted and converted to FASTA: {total_target_reads}\n")
     return total_reads
+
 
 
 def run_blast(input_file, output_dir, blastdb):
