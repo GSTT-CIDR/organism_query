@@ -55,7 +55,7 @@ def compile_and_launch():
         # Arguments for organism query script
         args = [
             f"-c /mnt/results/{entry1.get()}/{combobox6.get()}_hours/centrifuge/",
-            f"-f {entry3.get()}",
+            f"-f /mnt/results/{entry1.get()}/{combobox6.get()}_hours/files/",
             f"-o {get_entry4_with_quotes()}",
             f"-d /mnt/reports/{entry1.get()}/organism_query_{entry_4_clean}_{current_datetime}/",
             f"-b /mnt/db/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
@@ -141,7 +141,7 @@ label6.pack(side=tk.TOP, padx=5)  # Adjust the side to LEFT to align with the dr
 options = ['0.5', '1', '2', '16', '24']
 combobox6 = ttk.Combobox(frame6, values=options, width=37)
 combobox6.pack(side=tk.RIGHT, padx=5)  # Adjust according to your layout needs
-
+'''
 # Field 2
 frame2 = tk.Frame(root)
 frame2.pack(padx=10)
@@ -152,6 +152,7 @@ entry2.pack(side=tk.LEFT, padx=5)
 button2 = tk.Button(frame2, text="Choose File", command=lambda: choose_file(entry2))
 button2.pack(side=tk.LEFT)
 
+
 # Field 3
 frame3 = tk.Frame(root)
 frame3.pack(padx=10)
@@ -161,8 +162,9 @@ entry3 = tk.Entry(frame3, width=40)
 entry3.pack(side=tk.LEFT, padx=5)
 buttton3 = tk.Button(frame3, text="Choose directory", command=lambda: choose_directory_fastq(entry3))
 buttton3.pack(side=tk.LEFT)
+'''
 
-# Your existing setup for field4
+# Species name input
 frame4 = tk.Frame(root)
 frame4.pack(padx=10)
 label4 = tk.Label(frame4, text="Species name")
