@@ -41,11 +41,9 @@ def compile_and_launch():
     global process  # Make the process global to access it later for termination
     # Determine whether EPI2ME or CIDR input is used
     entry1_text = entry1.get()
-    entry2_text = entry2.get()
+#    entry2_text = entry2.get()
     
-    if entry1_text and entry2_text:
-        messagebox.showerror("Error", "Both report entries are filled. Please fill only one.")
-    elif entry1_text:
+    if entry1_text:
         # Clean organism name for output directory
         original_text = get_entry4_with_quotes()  # Get the text from entry4
         entry_4_clean = original_text.lower().replace(' ', '_').replace("'", "")
@@ -60,6 +58,7 @@ def compile_and_launch():
             f"-d /mnt/reports/{entry1.get()}/organism_query_{entry_4_clean}_{current_datetime}/",
             f"-b /mnt/db/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
         ]
+'''
     elif entry2_text:
         # Clean organism name for output directory
         original_text = get_entry4_with_quotes()  # Get the text from entry4
@@ -75,6 +74,7 @@ def compile_and_launch():
             f"-d {folder_path}/organism_query_{entry_4_clean}_{current_datetime}/",
             f"-b /mnt/db/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
         ]
+'''
     else:
         messagebox.showinfo("Result", "Query fields incomplete.")
     # Form the final command to be executed
