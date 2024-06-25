@@ -20,6 +20,7 @@ from datetime import datetime
 import pytaxonkit
 from tabulate import tabulate
 import gzip
+import shutil
 
 #Argument parsing
 def parse_args():
@@ -453,6 +454,22 @@ def cleanup(output_dir):
     os.remove(path3)
     path4 = os.path.join(output_dir, 'concatenated_subset_reads.fasta')
     subprocess.run(['gzip', path4])
+    
+
+def decompress_gzip(file_path):
+    decompressed_file_path = file_path.rstrip('.gz')
+    with gzip.open(file_path, 'rb') as f_in:
+        with open(decompressed_file_path, 'wb') as f_out:
+            shutil.copyfileobj(f_in, f_out)
+    return decompressed_file_path
+
+def compress_gzip(file_path):
+    compressed_file_path = file_path + '.gz'
+    with open(file_path, 'rb') as f_in:
+        with gzip.open(compressed_file_path, 'wb') as f_out:
+            shutil.copyfileobj(f_in, f_out)
+    return compressed_file_path
+
      
     
     
@@ -470,33 +487,32 @@ init()  # Initialize Colorama
 def main():
     # Parsing arguments
     args = parse_args()
-
     # Subsetting for EPI2ME
     if args.epi2me_report:
         # Declaring input source
         input_format = "EPI2ME"
         time_interval = "EPI2ME"
         read_ids = extract_read_ids_epi2me(args.epi2me_report, args.organism, args.output_dir)
-
     # Subsetting reads CIDR workflow
     elif args.centrifuge_report_dir:
         # Declaring input source
         input_format = "CIDR metag"
-
         # Building CIDR pipeline centrifuge outputs
         raw_report_path = os.path.join(args.centrifuge_report_dir, 'centrifuge_raw.tsv')
         raw_report_gz_path = raw_report_path + '.gz'
-
-        # Check if gzipped version exists and adjust path accordingly
+        
+        # Check if the gzipped file exists and decompress it
         if os.path.exists(raw_report_gz_path):
-            raw_report = gzip.open(raw_report_gz_path, 'rt')  # 'rt' mode for reading as text
+            raw_report = decompress_gzip(raw_report_gz_path)
+            gzipped = True
         elif os.path.exists(raw_report_path):
-            raw_report = open(raw_report_path, 'r')
+            raw_report = raw_report_path
+            gzipped = False
         else:
             print("Error: centrifuge_raw.tsv or centrifuge_raw.tsv.gz not found.", flush=True)
             sys.exit(1)
 
-        time_interval = raw_report_path.split('/')[-3]
+        time_interval = raw_report.split('/')[-3]
         centrifuge_report = os.path.join(args.centrifuge_report_dir, 'centrifuge_report.tsv')
         tax_ids = extract_tax_ids(centrifuge_report, args.organism)
         unique_taxids, unique_names = get_unique_children_taxids_and_names(tax_ids)
@@ -504,11 +520,15 @@ def main():
         print("Search widened for the following taxa:", flush=True)
         print(tabulate(taxid_name_pairs, headers=['Taxonomic ID', 'Name']), flush=True)
         read_ids = extract_read_ids(raw_report, unique_taxids, args.output_dir)
-
+        
+        # Recompress the file if it was decompressed
+        if gzipped:
+            compress_gzip(raw_report)
+            os.remove(raw_report)
     else:
         print("Error: No workflow analysis outputs were given.", flush=True)
         sys.exit(1)
-    raw_report.close()
+
     total_reads = extract_reads(args.fastq_dir, read_ids, args.output_dir)    
     subset_reads = os.path.join(args.output_dir, 'concatenated_subset_reads.fastq')
     #Blast pipeline

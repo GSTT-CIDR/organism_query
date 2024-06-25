@@ -33,3 +33,12 @@ The script parses the outputs of EPI2ME or the CIDR metagenomics workflows and r
 ### Example usage 
 Activate appropriate conda env:
 ```conda activate organism_query```
+Run organism query:
+```
+python organism_report.py 
+-c /media/grid/metagenomics/results/cidr_control/16_hours/centrifuge 
+-o 'Human adenovirus 3' 
+-f /data/GSTT_control_sample_01/GSTT_control_sample_01/20240424_1408_X4_FAY77387_d3868a4f/fastq_pass/barcode11/ 
+-d ~/temp/organism_query/ 
+-b /media/grid/metagenomics/db/blastdb/ref_viruses_rep_genomes
+```
