@@ -19,6 +19,7 @@ from jinja2 import Environment, FileSystemLoader
 from datetime import datetime
 import pytaxonkit
 from tabulate import tabulate
+import gzip
 
 #Argument parsing
 def parse_args():
