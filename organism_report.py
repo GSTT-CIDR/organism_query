@@ -277,25 +277,33 @@ def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir
 
             return reads
 
-
     def parse_blast_output_with_stats(output_dir):
-        # Read the TSV file without 'pident2'
-        df = pd.read_csv(os.path.join(output_dir, 'blast_results_6.tmp'), sep='\t', header=None, names=[
-            'qseqid', 'sseqid', 'pident', 'staxids', 'sscinames', 
-            'length', 'mismatch', 'gapopen', 'qstart', 'qend', 'sstart', 
-            'send', 'evalue', 'bitscore', 'qseq', 'qlen'
-        ])
+        file_path = os.path.join(output_dir, 'blast_results_6.tmp')
+        
+        # Check if the file exists
+        if not os.path.exists(file_path):
+            raise FileNotFoundError("No BLAST output file found at the specified path.")
 
+        try:
+            # Read the TSV file
+            df = pd.read_csv(file_path, sep='\t', header=None, names=[
+                'qseqid', 'sseqid', 'pident', 'staxids', 'sscinames', 
+                'length', 'mismatch', 'gapopen', 'qstart', 'qend', 'sstart', 
+                'send', 'evalue', 'bitscore', 'qseq', 'qlen'
+            ])
+        except Exception as e:
+            raise Exception(f"Error reading the BLAST output file: {e}")
+
+        if df.empty:
+            raise ValueError("The BLAST output file is empty or the format is incorrect.")
+        
         # Group by qseqid and select the row with the lowest evalue for each group
         best_hits = df.loc[df.groupby('qseqid')['evalue'].idxmin()]
 
-        # Count the frequency of each 'sscinames' in the best hits
+        # Count the frequency of each 'sscinames'
         sscinames_counts = Counter(best_hits['sscinames'])
-
-        # Find the two most common 'sscinames'
         two_most_common = sscinames_counts.most_common(2)
 
-        # Function to get stats for a given 'sscinames'
         def get_stats(sscinames):
             hits = best_hits[best_hits['sscinames'] == sscinames]
             avg_qlen = round(hits['qlen'].mean())
@@ -304,17 +312,17 @@ def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir
             query_count = hits['qseqid'].nunique()  # Count of unique queries
             return sscinames, avg_qlen, avg_pident, lowest_evalue, query_count
 
-        # Get stats for the most common and second most common 'sscinames'
-        most_common_stats = get_stats(two_most_common[0][0])
+        # Get stats for the most common 'sscinames'
+        most_common_stats = get_stats(two_most_common[0][0]) if two_most_common else ('none', 'none', 'none', 'none', 'none')
+
         # Check if there is more than one organism
         if len(two_most_common) > 1:
-            # Get stats for the second most common 'sscinames'
             second_most_common_stats = get_stats(two_most_common[1][0])
         else:
-            # Return 'none' if there is only one organism
             second_most_common_stats = ('none', 'none', 'none', 'none', 'none')
 
         return most_common_stats, second_most_common_stats
+
 
     most_common, second_most_common = parse_blast_output_with_stats(output_dir)
 

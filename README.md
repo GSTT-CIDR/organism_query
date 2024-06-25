@@ -1,22 +1,16 @@
 # Metagenomics organism query 
 ### Overview
-This package automates querying a subset of NGS reads based on previous taxonomic classification using BLASTn. The output produces a report helping the reader understand BLAST results and find the most likely species origin of the sequence.
+This tool automates querying a subset of NGS reads based on Centrifuge taxanomic classification outputs using BLASTn. The output produces a report helping the reader understand BLAST results and find the most likely origin of the sequence within the confines of the database applied.
 
-### Dependancies
+This tool has a streamlined and containerised implementation as part of the [CIDR metagenomics library](https://gstt-cidr.github.io/network_hub/).
+
+**This tool is for reasearch use and service evaluation only - it has not been validated for diagnostic use**
+
+### Database dependencies
 An explicit list to build a conda env can be found in the ```./conda/``` directory. In short:
-* NCBI BLAST
+* NCBI BLAST DB
+* NCBI taxa dump
 
-### Test data
-Download the [NCBI virus BLAST DB](https://ftp.ncbi.nlm.nih.gov/blast/db/ref_viruses_rep_genomes.tar.gz)
-
-
-
-### Important notes
-
-Intepreting BLAST
-Must be SPP name as in the reports
-
-* 
 ### Inputs
 The script parses the outputs of EPI2ME or the CIDR metagenomics workflows and raw sequencing reads. 
 
@@ -24,10 +18,8 @@ The script parses the outputs of EPI2ME or the CIDR metagenomics workflows and r
   -h, --help            show this help message and exit
   -e EPI2ME_REPORT, --epi2me_report EPI2ME_REPORT
                         Path to WIMP CSV file downloaded from EPI2ME
-  -c CENTRIFUGE_REPORT, --centrifuge_report CENTRIFUGE_REPORT
-                        Path to the human-readable Centrifuge report (TSV format) containing columns like Organism, Tax_ID, etc.
-  -r RAW_REPORT, --raw_report RAW_REPORT
-                        Path to the raw Centrifuge report (TSV format) containing columns like readID, seqID, taxID, etc.
+  -c CENTRIFUGE_REPORT_DIR, --centrifuge_report_dir CENTRIFUGE_REPORT_DIR
+                        Path to the two Centrifuge outputs: report (TSV format) containing columns like Organism, Tax_ID, etc and the raw Centrifuge report (TSV format) containing columns 'readID, seqID, taxID' etc.
   -o 'ORGANISM NAME', --organism 'ORGANISM NAME'
                         Organism name to search for in the Centrifuge report. The script extracts corresponding taxonomic IDs.
   -f FASTQ_DIR, --fastq_dir FASTQ_DIR
@@ -38,37 +30,6 @@ The script parses the outputs of EPI2ME or the CIDR metagenomics workflows and r
                         Prefix for the blastDB. Needs to be in the $BLASTDB path
 ```
 
-Prerequisites
-Python 3
-Pandas
-Plotly
-Dash
-Installation
-To use this script, ensure you have Python 3 installed. Then, install the required Python packages using pip:
-
-Copy code
-pip install pandas plotly dash
-Usage
-To run the script, navigate to the directory containing the script and execute it with Python:
-
-css
-Copy code
-python organism_report.py [arguments]
-The script accepts various arguments for customization. Use the -h flag to view all available options.
-
-Features
-Data Processing: The script uses Pandas to process data related to organisms.
-Visualization: It utilizes Plotly for generating interactive visualizations.
-Web Interface: Dash is employed to create a web-based user interface for presenting the results.
-Customization: Arguments can be passed to customize the data processing and visualization aspects.
-Example
-Here's an example command to run the script:
-
-css
-Copy code
-python organism_report.py --input data.csv --output report.html
-Replace data.csv with your input data file and report.html with the desired output file name.
-
-Contributing
-Contributions to this project are welcome. Please fork the repository, make your changes, and submit a pull request.
-```
+### Example usage 
+Activate appropriate conda env:
+```conda activate organism_query```

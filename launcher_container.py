@@ -11,6 +11,8 @@ import os
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread
 
+# Launcher for CIDR Organism Query 
+
 current_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
 # For initialising the subprocess state
 process = None
@@ -35,13 +37,14 @@ def get_entry4_with_quotes():
     """
     return "'" + entry4.get() + "'"
 
+# The BLASTDB is determined by an environment variable in the .ncbirc
 blast_db_dir = ""
 
+# Builds arguments to pass to the organism query script.
 def compile_and_launch():
     global process  # Make the process global to access it later for termination
     # Determine whether EPI2ME or CIDR input is used
     entry1_text = entry1.get()
-#    entry2_text = entry2.get()
     
     if entry1_text:
         # Clean organism name for output directory
@@ -100,13 +103,10 @@ label.pack()
 # Text section
 description1 = tk.Label(root, text="")
 description1.pack()
-description2 = tk.Label(root, text="Fill out the fields below with the files required to launch the query.", wraplength=430)
+description2 = tk.Label(root, text="Fill out the fields below with the information contained within a CIDR Metagenomics PDF report to BLAST classified reads. A window will be automatically opened showing the results.", wraplength=430)
 description2.pack()
 description1 = tk.Label(root, text="")
 description1.pack()
-description3 = tk.Label(root, text="You should only fill out one of the report input fields. If you are querying an EPI2ME report, navigate to the CSV downloaded from the EPI2ME website.", wraplength=430)
-description3.pack()
-
 
 # Field 1
 frame1 = tk.Frame(root)
@@ -124,28 +124,6 @@ label6.pack(side=tk.TOP, padx=5)  # Adjust the side to LEFT to align with the dr
 options = ['0.5', '1', '2', '16', '24']
 combobox6 = ttk.Combobox(frame6, values=options, width=37)
 combobox6.pack(side=tk.RIGHT, padx=5)  # Adjust according to your layout needs
-'''
-# Field 2
-frame2 = tk.Frame(root)
-frame2.pack(padx=10)
-label2 = tk.Label(frame2, text="EPI2ME WIMP CSV")
-label2.pack(side=tk.TOP)
-entry2 = tk.Entry(frame2, width=40)
-entry2.pack(side=tk.LEFT, padx=5)
-button2 = tk.Button(frame2, text="Choose File", command=lambda: choose_file(entry2))
-button2.pack(side=tk.LEFT)
-
-
-# Field 3
-frame3 = tk.Frame(root)
-frame3.pack(padx=10)
-label3 = tk.Label(frame3, text="MinKNOW barcode FASTQ directory")
-label3.pack(side=tk.TOP)
-entry3 = tk.Entry(frame3, width=40)
-entry3.pack(side=tk.LEFT, padx=5)
-buttton3 = tk.Button(frame3, text="Choose directory", command=lambda: choose_directory_fastq(entry3))
-buttton3.pack(side=tk.LEFT)
-'''
 
 # Species name input
 frame4 = tk.Frame(root)
@@ -158,7 +136,6 @@ entry4.pack(side=tk.LEFT, padx=5)
 # Dropdown (Combobox) for multiple choice input
 frame_dropdown = tk.Frame(root)
 frame_dropdown.pack(pady=5)
-
 label_dropdown = tk.Label(frame_dropdown, text="Choose a BLAST database:")
 label_dropdown.pack(side=tk.LEFT, padx=5)
 
@@ -167,18 +144,6 @@ dropdown = ttk.Combobox(frame_dropdown, textvariable=dropdown_var, state="readon
 dropdown['values'] = ('nt', 'refseq', 'ref_prok_rep_genomes', 'ref_viruses_rep_genomes', 'ref_euk_rep_genomes')  # Hardcoded options
 dropdown.current(0)  # Set the default value
 dropdown.pack(side=tk.LEFT)
-
-
-# Field 5
-#frame5 = tk.Frame(root)
-#frame5.pack(padx=10)
-#label5 = tk.Label(frame5, text="Output directory")
-#label5.pack(side=tk.TOP)
-#entry5 = tk.Entry(frame5, width=40)
-#entry5.pack(side=tk.LEFT, padx=5)
-#buttton5 = tk.Button(frame5, text="Choose output directory", command=lambda: choose_directory(entry5))
-#buttton5.pack(side=tk.LEFT)
-
 
 # 'Launch Script' button
 launch_button = tk.Button(root, text="Launch Script", command=compile_and_launch)
