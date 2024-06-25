@@ -56,7 +56,7 @@ def compile_and_launch():
         # Arguments for organism query script
         args = [
             f"-c /mnt/results/{entry1.get()}/{combobox6.get()}_hours/centrifuge/",
-            f"-f /mnt/results/{entry1.get()}/{combobox6.get()}_hours/files/",
+            f"-f /mnt/results/{entry1.get()}/{combobox6.get()}_hours/microbial/",
             f"-o {get_entry4_with_quotes()}",
             f"-d /mnt/reports/{entry1.get()}/organism_query_{entry_4_clean}_{current_datetime}/",
             f"-b /mnt/db/blastdb/{dropdown_var.get()}"  # Add the selected option from dropdown
