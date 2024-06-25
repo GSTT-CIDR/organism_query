@@ -36,10 +36,6 @@ def parse_args():
     
     return parser.parse_args()
 
-
-
-
-
 # Parsing report files and extracting reads from FASTQ file
 def ensure_trailing_slash(path):
     return os.path.join(path, '')
@@ -71,7 +67,6 @@ def get_unique_children_taxids_and_names(taxids):
     - List[str]: A list of unique names corresponding to the taxonomic IDs.
     """
     taxid_name_map = {}
-
     for taxid in taxids:
         # Pytaxonkit list
         pytaxonkit_output = pytaxonkit.list([taxid], raw=True, data_dir="/taxonkit")
@@ -474,19 +469,33 @@ init()  # Initialize Colorama
 def main():
     # Parsing arguments
     args = parse_args()
-    #Subsetting for EPI2ME
+
+    # Subsetting for EPI2ME
     if args.epi2me_report:
         # Declaring input source
         input_format = "EPI2ME"
         time_interval = "EPI2ME"
         read_ids = extract_read_ids_epi2me(args.epi2me_report, args.organism, args.output_dir)
+
     # Subsetting reads CIDR workflow
     elif args.centrifuge_report_dir:
         # Declaring input source
-        input_format = "CIDR metag"             
+        input_format = "CIDR metag"
+
         # Building CIDR pipeline centrifuge outputs
-        raw_report = os.path.join(args.centrifuge_report_dir, 'centrifuge_raw.tsv')
-        time_interval = raw_report.split('/')[-3]
+        raw_report_path = os.path.join(args.centrifuge_report_dir, 'centrifuge_raw.tsv')
+        raw_report_gz_path = raw_report_path + '.gz'
+
+        # Check if gzipped version exists and adjust path accordingly
+        if os.path.exists(raw_report_gz_path):
+            raw_report = gzip.open(raw_report_gz_path, 'rt')  # 'rt' mode for reading as text
+        elif os.path.exists(raw_report_path):
+            raw_report = open(raw_report_path, 'r')
+        else:
+            print("Error: centrifuge_raw.tsv or centrifuge_raw.tsv.gz not found.", flush=True)
+            sys.exit(1)
+
+        time_interval = raw_report_path.split('/')[-3]
         centrifuge_report = os.path.join(args.centrifuge_report_dir, 'centrifuge_report.tsv')
         tax_ids = extract_tax_ids(centrifuge_report, args.organism)
         unique_taxids, unique_names = get_unique_children_taxids_and_names(tax_ids)
@@ -494,9 +503,11 @@ def main():
         print("Search widened for the following taxa:", flush=True)
         print(tabulate(taxid_name_pairs, headers=['Taxonomic ID', 'Name']), flush=True)
         read_ids = extract_read_ids(raw_report, unique_taxids, args.output_dir)
+
     else:
         print("Error: No workflow analysis outputs were given.", flush=True)
         sys.exit(1)
+    raw_report.close()
     total_reads = extract_reads(args.fastq_dir, read_ids, args.output_dir)    
     subset_reads = os.path.join(args.output_dir, 'concatenated_subset_reads.fastq')
     #Blast pipeline
