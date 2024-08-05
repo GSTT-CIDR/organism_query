@@ -112,7 +112,7 @@ def extract_read_ids(raw_report, tax_ids, output_dir):
         sys.exit(1)  # Exit the script with an error status code, e.g., 1
     
     # Sort matched reads by score in descending order and select the top 10
-    top_reads = sorted(matched_reads, key=lambda x: x[1], reverse=True)[:10]
+    top_reads = sorted(matched_reads, key=lambda x: x[1], reverse=True)[:50]
     
     # Write the top 10 read_ids to the output file and count them
     read_count = 0

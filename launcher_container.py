@@ -111,7 +111,7 @@ description1.pack()
 # Field 1
 frame1 = tk.Frame(root)
 frame1.pack(pady=5)
-label1 = tk.Label(frame1, text="CIDR worklow sample_id")
+label1 = tk.Label(frame1, text="CIDR worklow Lab/sample ID")
 label1.pack(side=tk.TOP)
 entry1 = tk.Entry(frame1, width=40)
 entry1.pack(side=tk.LEFT, padx=5)
@@ -119,7 +119,7 @@ entry1.pack(side=tk.LEFT, padx=5)
 # Field 6 - dropdown
 frame6 = tk.Frame(root)
 frame6.pack(pady=5)
-label6 = tk.Label(frame6, text="CIDR workflow hour/interval")
+label6 = tk.Label(frame6, text="Metagenomics workflow report hour/interval")
 label6.pack(side=tk.TOP, padx=5)  # Adjust the side to LEFT to align with the dropdown
 options = ['0.5', '1', '2', '16', '24']
 combobox6 = ttk.Combobox(frame6, values=options, width=37)
@@ -128,7 +128,7 @@ combobox6.pack(side=tk.RIGHT, padx=5)  # Adjust according to your layout needs
 # Species name input
 frame4 = tk.Frame(root)
 frame4.pack(padx=10)
-label4 = tk.Label(frame4, text="Species name")
+label4 = tk.Label(frame4, text="Organism keyword")
 label4.pack(side=tk.TOP)
 entry4 = tk.Entry(frame4, width=40)
 entry4.pack(side=tk.LEFT, padx=5)
