@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 
-#read parsing
+# Import necessary libraries
 import argparse
 import os
 import sys
 import gzip
 import subprocess
-import sys
 import pandas as pd
 import csv
 from collections import Counter
 from colorama import init, Fore, Style
-#interactivate plotting
 import plotly.express as px
 import dash
 from dash import html, dcc, Input, Output
@@ -19,10 +17,9 @@ from jinja2 import Environment, FileSystemLoader
 from datetime import datetime
 import pytaxonkit
 from tabulate import tabulate
-import gzip
 import shutil
 
-#Argument parsing
+# Argument parsing
 def parse_args():
     parser = argparse.ArgumentParser(description=ascii_art + '''
     This script processes Centrifuge reports and FASTQ files for BLAST analysis and interpretation.
@@ -49,7 +46,7 @@ def extract_tax_ids(centrifuge_report, organism_name):
         for line in file:
             if organism_name in line:
                 parts = line.strip().split('\t')
-                tax_ids.append(parts[1])  # Assuming Tax_ID is the second column
+                tax_ids.append(parts[1])
     if not tax_ids:  # Check if tax_ids list is empty
         sys.stderr.write(f"{Fore.RED}Error: No tax IDs found for {organism_name}\n")
         sys.exit(1)  # Exit the script with an error status code, e.g., 1
@@ -93,7 +90,6 @@ def get_unique_children_taxids_and_names(taxids):
 
     return unique_taxids, unique_names
 
-
 def extract_read_ids(raw_report, tax_ids, output_dir):
     matched_reads = []  # List to store tuples of (read_id, score)
     
@@ -128,10 +124,6 @@ def extract_read_ids(raw_report, tax_ids, output_dir):
     
     return read_ids, matched_reads
 
-
-
-
-
 def extract_read_ids_epi2me(epi2me_report, organism, output_dir):
     read_ids = set()
     read_count = 0
@@ -143,7 +135,7 @@ def extract_read_ids_epi2me(epi2me_report, organism, output_dir):
     with open(epi2me_report, 'r') as file, open(os.path.join(output_dir, 'matched_read_ids.txt'), 'w') as output_file:
         csv_reader = csv.DictReader(file)
         for row in csv_reader:
-            if row['name'] == organism:
+            if row['name'].lower() == organism.lower():
                 read_id = row['readid']
                 if read_id not in read_ids:
                     read_ids.add(read_id)
@@ -151,9 +143,7 @@ def extract_read_ids_epi2me(epi2me_report, organism, output_dir):
                     read_count += 1
 
     sys.stderr.write(f"{Fore.GREEN}Number of reads matched with '{organism}': {read_count}\n")
-#    print(read_ids)
     return read_ids
-
 
 def extract_reads(fastq_dir, read_ids, output_dir):
     total_target_reads = 0
@@ -204,8 +194,6 @@ def extract_reads(fastq_dir, read_ids, output_dir):
     sys.stderr.write(f"{Fore.GREEN}Total reads extracted and converted to FASTA: {total_target_reads}\n")
     return total_reads
 
-
-
 def run_blast(input_file, output_dir, blastdb):
     sys.stderr.write("BLAST analysis started...\n")
     cmd = [
@@ -223,8 +211,6 @@ def run_blast(input_file, output_dir, blastdb):
     
     sys.stderr.write(f"{Fore.GREEN}BLAST analysis completed.{Style.RESET_ALL}\n")
 
-    
-
 def run_parser(input_file, output_dir, blastdb):
     sys.stderr.write("Parsing BLAST report...\n")
     cmd = [
@@ -239,19 +225,10 @@ def run_parser(input_file, output_dir, blastdb):
     subprocess.run(cmd2)
     sys.stderr.write("BLAST report parsing completed.\n")
 
-
-
-##############################
-##############################
-##############################
-
 def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir, input_format, time_interval, matched_reads):
     file_path = os.path.join(output_dir, 'blast_results.html')
     start_string = '<b>Query=</b>'
     end_string = 'Effective search space used:'
-
-
-
 
     def extract_blast_reads(file_path, start_string, end_string):
             reads = {}
@@ -320,11 +297,10 @@ def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir
 
         return most_common_stats, second_most_common_stats
 
-
     most_common, second_most_common = parse_blast_output_with_stats(output_dir)
 
     reads = extract_blast_reads(file_path, start_string, end_string)
-    #HTML for the accordion read view
+    # HTML for the accordion read view
     html_start1 = """
     <li class="page-item"><a class="page-link" href="#!" onclick="showSection({0})">{0}</a></li>
     """ 
@@ -383,26 +359,12 @@ def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir
         file.write(rendered_html)
     subprocess.Popen(["firefox", os.path.join(output_dir, 'organism_report.html')])
 
-
-        
-    
-
-##############################
-##Dash and plotly function####
-##############################
-
 def dash_func(output_dir):
     app = dash.Dash(__name__)
 
     app.layout = html.Div([
         dcc.Graph(id='scatter-plot'),
         
-#        html.Label('Length Threshold:'),
-#        dcc.Slider(id='length-slider', min=100, max=500, step=10, value=200),
-        
-#        html.Label('Percent Identity Threshold:'),
-#        dcc.Slider(id='pident-slider', min=50, max=100, step=5, value=80),
-
         html.Label('Color Variable:'),
         dcc.Dropdown(id='color-dropdown', 
                     options=[
@@ -421,21 +383,12 @@ def dash_func(output_dir):
                     "Alignment Length", "mismatch", "gapopen", "qstart", "qend", "sstart", 
                     "send", "evalue", "bitscore", "qseq", "qlen"]
 
-        # Read the BLAST output file
-#        data = pd.read_csv(file_path, sep="\t", names=col_names)
         filtered_data = pd.read_csv(file_path, sep="\t", names=col_names)
-        # Filter out rows where qlen is below the threshold and pident is below the pident threshold
-#        filtered_data = data[(data["Alignment Length"] >= length_threshold) & (data["Percent Identity (%)"] >= pident_threshold)]
-
         return filtered_data
-
 
     @app.callback(
         Output('scatter-plot', 'figure'),
         [Input('color-dropdown', 'value')]
-#        [Input('length-slider', 'value'),
-#        Input('pident-slider', 'value'),
-#        Input('color-dropdown', 'value')]
     )
     
     def update_graph(color_variable):
@@ -446,7 +399,6 @@ def dash_func(output_dir):
         return fig
     app.run_server()
 
-    
 def cleanup(output_dir):
     path2 = os.path.join(output_dir, 'blast_results.html')
     path3 = os.path.join(output_dir, 'blast_results_11.tmp')
@@ -454,7 +406,6 @@ def cleanup(output_dir):
     os.remove(path3)
     path4 = os.path.join(output_dir, 'concatenated_subset_reads.fasta')
     subprocess.run(['gzip', path4])
-    
 
 def decompress_gzip(file_path):
     decompressed_file_path = file_path.rstrip('.gz')
@@ -470,9 +421,6 @@ def compress_gzip(file_path):
             shutil.copyfileobj(f_in, f_out)
     return compressed_file_path
 
-     
-    
-    
 ascii_art = r''' 
              ____ ____ _____ _____      ____ ___ ____  ____  
             / ___/ ___|_   _|_   _|    / ___|_ _|  _ \|  _ \ 
@@ -514,8 +462,14 @@ def main():
 
         time_interval = raw_report.split('/')[-3]
         centrifuge_report = os.path.join(args.centrifuge_report_dir, 'centrifuge_report.tsv')
-        tax_ids = extract_tax_ids(centrifuge_report, args.organism)
-        unique_taxids, unique_names = get_unique_children_taxids_and_names(tax_ids)
+        
+        if args.organism.lower() == "unclassified":
+            tax_ids = ['0']
+            unique_taxids, unique_names = ['0'], ['Unclassified']
+        else:
+            tax_ids = extract_tax_ids(centrifuge_report, args.organism)
+            unique_taxids, unique_names = get_unique_children_taxids_and_names(tax_ids)
+        
         taxid_name_pairs = list(zip(unique_taxids, unique_names))
         print("Search widened for the following taxa:", flush=True)
         print(tabulate(taxid_name_pairs, headers=['Taxonomic ID', 'Name']), flush=True)
@@ -531,16 +485,13 @@ def main():
 
     total_reads = extract_reads(args.fastq_dir, read_ids, args.output_dir)    
     subset_reads = os.path.join(args.output_dir, 'concatenated_subset_reads.fastq')
-    #Blast pipeline
-    run_blast(subset_reads, args.output_dir, args.blastdb )
-    run_parser(subset_reads, args.output_dir, args.blastdb )
-    #Building report
+    # Blast pipeline
+    run_blast(subset_reads, args.output_dir, args.blastdb)
+    run_parser(subset_reads, args.output_dir, args.blastdb)
+    # Building report
     report_build(args.output_dir, args.organism, read_ids, args.blastdb, total_reads, args.fastq_dir, input_format, time_interval, matched_reads)
     cleanup(args.output_dir)
     dash_func(args.output_dir)
 
-  
 if __name__ == '__main__':
     main()
-
-    
