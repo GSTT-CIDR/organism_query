@@ -111,10 +111,10 @@ def extract_read_ids(raw_report, tax_ids, output_dir):
         sys.stderr.write(f"{Fore.RED}Error: No read IDs found matching the given Tax IDs\n")
         sys.exit(1)  # Exit the script with an error status code, e.g., 1
     
-    # Sort matched reads by score in descending order and select the top 10
+    # Sort matched reads by score in descending order and select the top N
     top_reads = sorted(matched_reads, key=lambda x: x[1], reverse=True)[:50]
     
-    # Write the top 10 read_ids to the output file and count them
+    # Write the top N read_ids to the output file and count them
     read_count = 0
     read_ids = set()
     with open(os.path.join(output_dir, 'matched_read_ids.txt'), 'w') as id_file:
@@ -126,7 +126,7 @@ def extract_read_ids(raw_report, tax_ids, output_dir):
     # Output the number of reads matched with TaxIDs
     sys.stderr.write(f"{Fore.GREEN}Number of reads matched with TaxIDs (top 10 by score): {read_count}\n")
     
-    return read_ids
+    return read_ids, matched_reads
 
 
 
@@ -245,7 +245,7 @@ def run_parser(input_file, output_dir, blastdb):
 ##############################
 ##############################
 
-def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir, input_format, time_interval):
+def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir, input_format, time_interval, matched_reads):
     file_path = os.path.join(output_dir, 'blast_results.html')
     start_string = '<b>Query=</b>'
     end_string = 'Effective search space used:'
@@ -350,7 +350,7 @@ def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir
         reads[i] = html_start2.format(count) + '<pre>' + original_reads[i] + '</pre>' + html_end
     reads_list2 = '\n'.join(reads.values())
 
-    #quick stats
+    # Quick stats
     barcode = fastq_dir.split('/')[-1]
     sample_id = output_dir.split('/')[3]    
 
@@ -364,7 +364,7 @@ def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir
                 "date": datetime.now(),
                 "BLAST1": reads_list1,
                 "BLAST2": reads_list2,
-                "organism_read_count": len(read_ids),
+                "organism_read_count": len(matched_reads),
                 "organism": organism,
                 "blast_db": blastdb.split('/')[-1],
                 "total_fastq_reads": total_reads,
@@ -492,7 +492,7 @@ def main():
         # Declaring input source
         input_format = "EPI2ME"
         time_interval = "EPI2ME"
-        read_ids = extract_read_ids_epi2me(args.epi2me_report, args.organism, args.output_dir)
+        read_ids, matched_reads = extract_read_ids_epi2me(args.epi2me_report, args.organism, args.output_dir)
     # Subsetting reads CIDR workflow
     elif args.centrifuge_report_dir:
         # Declaring input source
@@ -535,7 +535,7 @@ def main():
     run_blast(subset_reads, args.output_dir, args.blastdb )
     run_parser(subset_reads, args.output_dir, args.blastdb )
     #Building report
-    report_build(args.output_dir, args.organism, read_ids, args.blastdb, total_reads, args.fastq_dir, input_format, time_interval)
+    report_build(args.output_dir, args.organism, read_ids, args.blastdb, total_reads, args.fastq_dir, input_format, time_interval, matched_reads)
     cleanup(args.output_dir)
     dash_func(args.output_dir)
 

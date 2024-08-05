@@ -11,6 +11,23 @@
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 <link href="../../../lib/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+<!-- Wraps pagination links to the page/display -->
+<style>
+    .pagination {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+    .pagination .page-item {
+        display: inline-block;
+        margin-right: 3px; /* Adjust margin as needed */
+    }
+    .pagination .page-link {
+        width: 45px; /* Fixed width for consistency */
+        text-align: center;
+    }
+</style>
 </head>
 
 
@@ -66,42 +83,6 @@
                 </div>  
             </div>
         </div>                
-        <!--
-        <div class="card mb-4">
-
-            <div class="card-header"><strong>Quality control</strong></div>
-            <div class="col-sm">
-                <div class="card-body">
-                    <table class="table table-hover">
-                        <tr>
-                            <th scope="row">Total microbial reads</th>
-                            <td>{{report.micro_reads}}</td>
-                            <th scope="row">Total reads</th>
-                            <td>{{report.total_reads}}</td>
-                            <th scope="row">Total human reads</th>
-                            <td>{{report.human_reads}}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Total bases</th>
-                            <td>{{report.total_bp}}</td>
-                            <th scope="row">Mean read length</th>
-                            <td>{{report.mean_read_len}}</td>
-                            <th scope="row">Mean read quality</th>
-                            <td>{{report.mean_read_qual}}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Internal control (TMV) </th>
-                            <td>{{report.ic}}</td>
-                            <th scope="row">Negative Control</th>
-                            <td class="checkbox"><input type="checkbox" name="Pass", id="NC" \> Pass <input type="checkbox" name="Fail", id="NC" \> Fail </td>
-                            <th scope="row">Unclassified/Below Threshold</th>
-                            <td>{{report.unclass_reads}}/{{report.reads_below_threshold}}</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        </div>
--->
         <div class="card mb-4">
         <div class="card-header"><strong>BLAST QC</strong></div>
             <div class="col-sm">
@@ -112,7 +93,7 @@
                             <td>{{report.total_fastq_reads}}</td>
                             <th scope="row">Target organism</th>
                             <td>{{report.organism}}</td>
-                            <th scope="row">Target organism reads</th>
+                            <th scope="row">Total target organism reads</th>
                             <td>{{report.organism_read_count}}</td>
                         </tr>
                         <tr>
@@ -186,7 +167,7 @@
         <div class="card-header"><strong>BLAST alignment visualisation</strong></div>
                 <div class="col-sm">
                     <div class="card-body">
-                        <h6>Read number</h6>
+                        <h6>BLAST alignment subset (50 reads max)</h6>
                         <!-- Bootstrap 5 Pagination -->
                         <nav aria-label="Page navigation">
                             <ul class="pagination">
