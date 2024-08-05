@@ -492,7 +492,7 @@ def main():
         # Declaring input source
         input_format = "EPI2ME"
         time_interval = "EPI2ME"
-        read_ids, matched_reads = extract_read_ids_epi2me(args.epi2me_report, args.organism, args.output_dir)
+        read_ids = extract_read_ids_epi2me(args.epi2me_report, args.organism, args.output_dir)
     # Subsetting reads CIDR workflow
     elif args.centrifuge_report_dir:
         # Declaring input source
@@ -519,7 +519,7 @@ def main():
         taxid_name_pairs = list(zip(unique_taxids, unique_names))
         print("Search widened for the following taxa:", flush=True)
         print(tabulate(taxid_name_pairs, headers=['Taxonomic ID', 'Name']), flush=True)
-        read_ids = extract_read_ids(raw_report, unique_taxids, args.output_dir)
+        read_ids, matched_reads = extract_read_ids(raw_report, unique_taxids, args.output_dir)
         
         # Recompress the file if it was decompressed
         if gzipped:
