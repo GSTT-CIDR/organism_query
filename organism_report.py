@@ -357,7 +357,7 @@ def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir
     # Output the rendered HTML to a file
     with open(os.path.join(output_dir, 'organism_report.html'), 'w', encoding='utf-8') as file:
         file.write(rendered_html)
-    subprocess.Popen(["firefox", os.path.join(output_dir, 'organism_report.html')])
+    subprocess.Popen(["firefox", "--kiosk" ,os.path.join(output_dir, 'organism_report.html')])
 
 def dash_func(output_dir):
     app = dash.Dash(__name__)
