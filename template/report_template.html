@@ -10989,9 +10989,7 @@ textarea.form-control-lg {
                     <div class="row">
                         <div class="col-12" style="padding: 0;"> <!-- Ensure no padding on the column -->
                             <!-- Inline CSS for iframe -->
-                            <iframe src="http://127.0.0.1:8050/" style="width: 100%; height: 65vh; border: none;" allowfullscreen aria-label="Interactive BLAST Plot">
-                                <p>The interactive BLAST plot is only available immediately after running the organism query and only when the process/terminal is still running. Repeat the analysis to view the interactive plot again.</p>
-                            </iframe>
+                            {{ report.plot_html | safe }}
                         </div>
                     </div>
                 </div>                
