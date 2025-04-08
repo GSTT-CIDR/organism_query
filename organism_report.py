@@ -254,23 +254,44 @@ def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir
         if df.empty:
             raise ValueError("The BLAST output file is empty or the format is incorrect.")
 
+        # Get best hits
         best_hits = df.loc[df.groupby('qseqid')['evalue'].idxmin()]
+
+        # Replace NaN sscinames with a placeholder
+        best_hits['sscinames'] = best_hits['sscinames'].fillna('unknown')
+
         sscinames_counts = Counter(best_hits['sscinames'])
         two_most_common = sscinames_counts.most_common(2)
 
-        def get_stats(sscinames):
-            hits = best_hits[best_hits['sscinames'] == sscinames]
+        def get_stats(species_name):
+            # If the placeholder is 'unknown', return a safe tuple
+            if species_name == 'unknown':
+                return (species_name, 'N/A', 'N/A', 'N/A', 0)
+
+            # Filter rows for this species name
+            hits = best_hits[best_hits['sscinames'] == species_name]
+            if hits.empty:
+                # If none match, safely return placeholders
+                return (species_name, 'N/A', 'N/A', 'N/A', 0)
+
+            # Otherwise, compute your stats
             avg_qlen = round(hits['qlen'].mean())
             avg_pident = round(hits['pident'].mean())
             lowest_evalue = hits['evalue'].min()
             query_count = hits['qseqid'].nunique()
-            return sscinames, avg_qlen, avg_pident, lowest_evalue, query_count
+            return (species_name, avg_qlen, avg_pident, lowest_evalue, query_count)
 
-        most_common_stats = get_stats(two_most_common[0][0]) if two_most_common else ('none', 'none', 'none', 'none', 'none')
+        # Safely get the two most common species
+        if len(two_most_common) > 0:
+            most_common_stats = get_stats(two_most_common[0][0])
+        else:
+            most_common_stats = ('none', 'none', 'none', 'none', 'none')
+
         if len(two_most_common) > 1:
             second_most_common_stats = get_stats(two_most_common[1][0])
         else:
             second_most_common_stats = ('none', 'none', 'none', 'none', 'none')
+
         return most_common_stats, second_most_common_stats
 
     most_common, second_most_common = parse_blast_output_with_stats(output_dir)

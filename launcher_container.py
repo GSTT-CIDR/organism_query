@@ -237,7 +237,7 @@ label_dropdown.pack(side=tk.LEFT, padx=5)
 
 dropdown_var = tk.StringVar()
 dropdown = ttk.Combobox(frame_dropdown, textvariable=dropdown_var, state="readonly")
-dropdown['values'] = ('core_nt', 'nt', 'refseq', 'ref_prok_rep_genomes', 'ref_viruses_rep_genomes', 'ref_euk_rep_genomes')
+dropdown['values'] = ('core_nt', 'nt', 'refseq', 'ref_prok_rep_genomes', 'ref_viruses_rep_genomes', 'ref_euk_rep_genomes', 'blastdb/v10_combined_automated_blast')
 dropdown.current(0)
 dropdown.pack(side=tk.LEFT)
 
