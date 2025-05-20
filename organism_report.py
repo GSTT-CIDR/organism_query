@@ -88,25 +88,38 @@ def get_unique_children_taxids_and_names(taxids):
     return unique_taxids, unique_names
 
 def extract_read_ids(raw_report, tax_ids, output_dir, top_n=50, random_sort=False):
-    matched_reads = []
+    # Dictionary to store best score for each read ID
+    read_scores = {}
+    
     with open(raw_report, 'r') as file:
         for line in file:
             parts = line.strip().split('\t')
             if parts[2] in tax_ids:
                 read_id = parts[0]
                 score = int(parts[3])
-                matched_reads.append((read_id, score))
-
-    if not matched_reads:
+                
+                # Keep only the highest score for each read ID
+                if read_id not in read_scores or score > read_scores[read_id]:
+                    read_scores[read_id] = score
+    
+    # Convert to list of tuples (read_id, score)
+    unique_matched_reads = [(read_id, score) for read_id, score in read_scores.items()]
+    
+    if not unique_matched_reads:
         sys.stderr.write(f"{Fore.RED}Error: No read IDs found matching the given Tax IDs\n")
         sys.exit(1)
-
+    
+    # Report on total unique reads before subsetting
+    total_unique_reads = len(unique_matched_reads)
+    
     if random_sort:
-        subset_size = min(top_n, len(matched_reads))
-        selected_reads = random.sample(matched_reads, subset_size)
+        # Random selection of unique reads
+        subset_size = min(top_n, total_unique_reads)
+        selected_reads = random.sample(unique_matched_reads, subset_size)
     else:
-        selected_reads = sorted(matched_reads, key=lambda x: x[1], reverse=True)[:top_n]
-
+        # Top N selection of unique reads by score
+        selected_reads = sorted(unique_matched_reads, key=lambda x: x[1], reverse=True)[:top_n]
+    
     read_count = 0
     read_ids = set()
     with open(os.path.join(output_dir, 'matched_read_ids.txt'), 'w') as id_file:
@@ -114,9 +127,10 @@ def extract_read_ids(raw_report, tax_ids, output_dir, top_n=50, random_sort=Fals
             id_file.write(read_id + '\n')
             read_ids.add(read_id)
             read_count += 1
-
-    sys.stderr.write(f"{Fore.GREEN}Number of reads matched with TaxIDs (subset size={read_count}): {read_count}\n")
-    return read_ids, matched_reads
+    
+    sys.stderr.write(f"{Fore.GREEN}Found {total_unique_reads} unique reads matching TaxIDs\n")
+    sys.stderr.write(f"{Fore.GREEN}Number of reads selected for analysis (subset size={read_count}): {read_count}\n")
+    return read_ids, unique_matched_reads
 
 def extract_read_ids_epi2me(epi2me_report, organism, output_dir):
     read_ids = set()
