@@ -249,7 +249,7 @@ launch_button.pack(pady=10)
 notebook = ttk.Notebook(root)
 notebook.pack(fill=tk.BOTH, expand=True)
 
-version = tk.Label(root, text="Organism Query v1.7 (pre-release)", font=("Helvetica", 8))
+version = tk.Label(root, text="Organism Query v1.7.1 (RMg network release)", font=("Helvetica", 8))
 version.pack(side="bottom", anchor="w", padx=10, pady=10)
 
 # Ensure the subprocesses are terminated when the window is closed
