@@ -355,7 +355,7 @@ def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir
         "plot_html": plot_html,
     }
 
-    env = Environment(loader=FileSystemLoader('./template/'), autoescape=False)
+    env = Environment(loader=FileSystemLoader('/mnt/db/ref/Template/organism_query'), autoescape=False)
     template = env.get_template('report_template.html')
     rendered_html = template.render({"report": report_dict})
 
