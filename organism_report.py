@@ -383,6 +383,9 @@ def build_embedded_plot(output_dir):
     if df.empty:
         return "<p style='color:red;'>BLAST output is empty; cannot create offline plot.</p>"
 
+    # Sort by bitscore descending to ensure highest scoring taxa appear first in legend
+    df = df.sort_values('bitscore', ascending=False)
+
     fig = px.scatter(
         df,
         x='Percent Identity (%)',
