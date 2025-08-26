@@ -1,4 +1,4 @@
-# Metagenomics organism query 
+# CIDR Organism Query 
 ### Overview
 This tool automates querying a subset of NGS reads based on Centrifuge taxanomic classification outputs using BLASTn. The output produces a report helping the reader understand BLAST results and find the most likely origin of the sequence within the confines of the database applied.
 
