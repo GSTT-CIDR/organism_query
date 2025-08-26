@@ -158,7 +158,11 @@ def on_closing():
 root = tk.Tk()
 root.title("CIDR BLAST organism query launcher")
 
-
+# Set application icon
+icon_path = "/mnt/lib/install/CIDR_logo_square_rmg_agnes.png"
+if os.path.isfile(icon_path):
+    icon_img = ImageTk.PhotoImage(file=icon_path)
+    root.iconphoto(True, icon_img)
 
 # Add description and image
 try:
