@@ -1,0 +1,37 @@
+Bootstrap: docker
+From: ubuntu:20.04
+
+%post
+    
+    # Installing base programs
+    export DEBIAN_FRONTEND=noninteractive
+    export DEBCONF_NONINTERACTIVE_SEEN=true 
+    apt-get update && apt-get install -y wget bzip2 ca-certificates git squashfuse fuse2fs gocryptfs x11-xserver-utils libtiff5 tzdata firefox libcanberra-gtk-module libcanberra-gtk3-module
+
+    # Install google chrome
+    wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    apt-get install -y ./google-chrome-stable_current_amd64.deb 
+
+    # Clone the organism_query repository
+    git clone https://github.com/GSTT-CIDR/organism_query.git
+    
+    # Download and install Miniconda
+    wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
+    bash Miniforge3-Linux-x86_64.sh -b -p /opt/conda
+    rm Miniforge3-Linux-x86_64.sh
+    
+    # Initialize mamba and install dependencies    
+    /bin/bash -c '/opt/conda/bin/conda init && source /opt/conda/etc/profile.d/conda.sh && mamba create --name organism_query --file /organism_query/conda/organism_query.txt'
+
+    # Download the NCBI taxdump
+    /bin/bash -c 'cd / ; wget https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz; tar -zxvf taxdump.tar.gz; mkdir -p taxonkit; mv names.dmp nodes.dmp delnodes.dmp merged.dmp taxonkit; rm *.dmp'
+
+
+%environment
+    /bin/bash -c 'source /opt/conda/etc/profile.d/conda.sh'
+
+%runscript
+    cd /organism_query/
+    /bin/bash -c 'source /opt/conda/etc/profile.d/conda.sh && conda activate organism_query && python launcher_container.py'
+    
+    
