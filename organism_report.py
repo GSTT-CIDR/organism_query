@@ -454,7 +454,7 @@ def main():
         matched_reads = []
     elif args.centrifuge_report_dir:
         input_format = "CIDR metag"
-        raw_report_path = os.path.join(args.centrifuge_report_dir, 'centrifuge_raw.tsv')
+        raw_report_path = os.path.join(args.centrifuge_report_dir, 'centrifuge_raw_filtered.tsv')
         raw_report_gz_path = raw_report_path + '.gz'
 
         if os.path.exists(raw_report_path):
