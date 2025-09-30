@@ -13,7 +13,8 @@ From: ubuntu:20.04
     apt-get install -y ./google-chrome-stable_current_amd64.deb 
 
     # Clone the organism_query repository
-    git clone https://github.com/GSTT-CIDR/organism_query.git
+    git clone https://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@github.com/GSTT-CIDR/organism_query.git
+    #git clone https://github.com/GSTT-CIDR/organism_query.git
     
     # Download and install Miniconda
     wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
@@ -23,8 +24,8 @@ From: ubuntu:20.04
     # Initialize mamba and install dependencies    
     /bin/bash -c '/opt/conda/bin/conda init && source /opt/conda/etc/profile.d/conda.sh && mamba create --name organism_query --file /organism_query/conda/organism_query.txt'
 
-    # Download the NCBI taxdump
-    /bin/bash -c 'cd / ; wget https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz; tar -zxvf taxdump.tar.gz; mkdir -p taxonkit; mv names.dmp nodes.dmp delnodes.dmp merged.dmp taxonkit; rm *.dmp'
+    # Download the NCBI taxdump - deprecated to keep taxonomy static for sanity
+    #/bin/bash -c 'cd / ; wget https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz; tar -zxvf taxdump.tar.gz; mkdir -p taxonkit; mv names.dmp nodes.dmp delnodes.dmp merged.dmp taxonkit; rm *.dmp'
 
 
 %environment

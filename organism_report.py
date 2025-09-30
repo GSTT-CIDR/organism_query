@@ -70,7 +70,7 @@ def extract_tax_ids(centrifuge_report, organism_name):
 def get_unique_children_taxids_and_names(taxids):
     taxid_name_map = {}
     for taxid in taxids:
-        pytaxonkit_output = pytaxonkit.list([taxid], raw=True, data_dir="/taxonkit")
+        pytaxonkit_output = pytaxonkit.list([taxid], raw=True, data_dir="/mnt/db/ref/refseq/taxonomy")
 
         def extract_ids_and_names(nested_dict):
             for key, value in nested_dict.items():
