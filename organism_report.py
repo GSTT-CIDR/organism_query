@@ -53,6 +53,9 @@ def ensure_trailing_slash(path):
 
 def extract_tax_ids(centrifuge_report, organism_name):
     print(ascii_art, flush=True)
+    print("CIDR Organism Query")
+    print("NHS Clinical Metagenomics Platform")
+    print("Written by Daniel Ward")
     tax_ids = []
     with open(centrifuge_report, 'r') as file:
         for line in file:
