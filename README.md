@@ -4,7 +4,7 @@ This tool automates querying a subset of NGS reads based on Centrifuge taxanomic
 
 This tool has a streamlined and containerised implementation as part of the [CIDR metagenomics library](https://gstt-cidr.github.io/network_hub/).
 
-**This tool is for reasearch use and service evaluation only - it has not been validated for diagnostic use**
+**This tool is for reasearch use only - it has not been validated for diagnostic use**
 
 ### Database dependencies
 An explicit list to build a conda env can be found in the ```./conda/``` directory. In short:

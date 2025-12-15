@@ -9,13 +9,13 @@ import datetime
 import os
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread
-import csv  # For reading the replacement CSV
+import csv 
 
 # Globals
 current_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
 processes = []  # Keep track of all Popen processes
 
-# Hard-coded CSV file path for the lookup
+# Hard-coded CSV file path for the lookup - should change to source from metag config
 CSV_LOOKUP_PATH = "/mnt/db/ref/reporting_name_replacement_list.csv"
 
 def clean_organism_name(name: str) -> str:
@@ -76,8 +76,6 @@ def compile_and_launch():
             messagebox.showerror("Error", f"Could not read CSV file '{CSV_LOOKUP_PATH}': {e}")
             return
     else:
-        # If the file doesn't exist, you could show an error or just proceed.
-        # Let's show an error to let the user know.
         messagebox.showerror("Error", f"Could not find CSV file: {CSV_LOOKUP_PATH}")
         return
 
@@ -88,7 +86,7 @@ def compile_and_launch():
         if not org_raw:
             continue  # Skip blank entries
 
-        # If the user typed a known 'replacement', revert it to 'original'
+        # If the user typed a known 'replacement', revert it to 'original'. Not a fan. Need to revise this function.
         if org_raw in lookup_dict:
             org_raw = lookup_dict[org_raw]
 
@@ -105,7 +103,8 @@ def compile_and_launch():
             f"-f /mnt/results/{sample_id}/{hours_val}_hours/microbial/",
             f"-o {org_quoted}",
             f"-d {directory_path}",
-            f"-b /mnt/db/blastdb/{dropdown_var.get()}"
+            f"-b /mnt/db/blastdb/{dropdown_var.get()}",
+            f"-r"
         ]
         
         command = f"python -u organism_report.py {' '.join(args)}"
@@ -241,7 +240,7 @@ label_dropdown.pack(side=tk.LEFT, padx=5)
 
 dropdown_var = tk.StringVar()
 dropdown = ttk.Combobox(frame_dropdown, textvariable=dropdown_var, state="readonly")
-dropdown['values'] = ('core_nt', 'nt', 'refseq', 'ref_prok_rep_genomes', 'ref_viruses_rep_genomes', 'ref_euk_rep_genomes', 'blastdb/v14_autoquery_release')
+dropdown['values'] = ('core_nt', 'nt', 'refseq', 'ref_prok_rep_genomes', 'ref_viruses_rep_genomes', 'ref_euk_rep_genomes', 'autoquery_blast_db/v14_autoquery_release')
 dropdown.current(0)
 dropdown.pack(side=tk.LEFT)
 

@@ -17,6 +17,8 @@ import pytaxonkit
 from tabulate import tabulate
 import shutil
 
+# Could do with refactoring into classes and modules. Specifically to unify Auto Query and this script.
+
 # Set environment variables for BLAST
 os.environ['NCBI_CONFIG_OVERRIDES'] = "TRUE"
 os.environ['BLASTDB'] = "/mnt/db/blastdb"
@@ -52,6 +54,7 @@ def ensure_trailing_slash(path):
     return os.path.join(path, '')
 
 def extract_tax_ids(centrifuge_report, organism_name):
+    """ Extract taxonomic IDs for a given organism from a Centrifuge report."""
     print(ascii_art, flush=True)
     print("CIDR Organism Query")
     print("NHS Clinical Metagenomics Platform")
@@ -71,6 +74,7 @@ def extract_tax_ids(centrifuge_report, organism_name):
 
 
 def get_unique_children_taxids_and_names(taxids):
+    """Resolves taxonomy and finds all unique child taxids and names for given taxids."""
     taxid_name_map = {}
     for taxid in taxids:
         pytaxonkit_output = pytaxonkit.list([taxid], raw=True, data_dir="/mnt/db/ref/refseq/taxonomy")
@@ -272,7 +276,8 @@ def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir
             raise ValueError("The BLAST output file is empty or the format is incorrect.")
 
         # Get best hits
-        best_hits = df.loc[df.groupby('qseqid')['evalue'].idxmin()]
+        # There was a bug here where best hits were erroneously sorted on evalue - usually evalue = 0.0. BLAST outfmt 6 ordered by bitscore so we got away with it. 
+        best_hits = df.loc[df.groupby('qseqid')['bitscore'].idxmax()]
 
         # Replace NaN sscinames with a placeholder
         best_hits['sscinames'] = best_hits['sscinames'].fillna('unknown')
@@ -326,13 +331,15 @@ def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir
     html_end = """
         </div>\n    """
 
+    # Fixed zero indexing on HTML report
+
     original_reads = reads.copy()
     for count, i in enumerate(reads.keys()):
-        reads[i] = html_start1.format(count)
+        reads[i] = html_start1.format(count + 1)
     reads_list1 = '\n'.join(reads.values())
 
     for count, i in enumerate(original_reads.keys()):
-        reads[i] = html_start2.format(count) + '<pre>' + original_reads[i] + '</pre>' + html_end
+        reads[i] = html_start2.format(count + 1) + '<pre>' + original_reads[i] + '</pre>' + html_end
     reads_list2 = '\n'.join(reads.values())
 
     barcode = fastq_dir.split('/')[-1]
