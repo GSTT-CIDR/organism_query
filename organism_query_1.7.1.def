@@ -6,11 +6,11 @@ From: ubuntu:20.04
     # Installing base programs
     export DEBIAN_FRONTEND=noninteractive
     export DEBCONF_NONINTERACTIVE_SEEN=true 
-    apt-get update && apt-get install -y wget bzip2 ca-certificates git squashfuse fuse2fs gocryptfs x11-xserver-utils libtiff5 tzdata firefox libcanberra-gtk-module libcanberra-gtk3-module
+    apt-get update && apt-get install -y wget bzip2 ca-certificates git squashfuse fuse2fs gocryptfs x11-xserver-utils libtiff5 tzdata firefox libcanberra-gtk-module libcanberra-gtk3-module chromium-browser
 
-    # Install google chrome
-    wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-    apt-get install -y ./google-chrome-stable_current_amd64.deb 
+    # Install google chrome - deprecated for chromium due to licensing issues
+    #wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    #apt-get install -y ./google-chrome-stable_current_amd64.deb 
 
     # Clone the organism_query repository
     git clone https://github.com/GSTT-CIDR/organism_query.git
