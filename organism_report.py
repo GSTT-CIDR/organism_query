@@ -372,7 +372,17 @@ def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir
     with open(os.path.join(output_dir, 'organism_report.html'), 'w', encoding='utf-8') as fh:
         fh.write(rendered_html)
 
-    subprocess.Popen(["chromium-browser", os.path.join(output_dir, 'organism_report.html')], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.Popen([
+        "chromium-browser",
+        "--noerrors",
+        "--disable-session-crashed-bubble",
+        "--disable-infobars",
+        "--no-default-browser-check",
+        "--no-first-run",
+        "--log-level=3",
+        "--disable-logging",
+        os.path.join(output_dir, 'organism_report.html')
+    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 def build_embedded_plot(output_dir):
     file_path = os.path.join(output_dir, 'blast_results_6.tmp')

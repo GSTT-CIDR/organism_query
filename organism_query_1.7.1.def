@@ -6,11 +6,18 @@ From: ubuntu:20.04
     # Installing base programs
     export DEBIAN_FRONTEND=noninteractive
     export DEBCONF_NONINTERACTIVE_SEEN=true 
-    apt-get update && apt-get install -y wget bzip2 ca-certificates git squashfuse fuse2fs gocryptfs x11-xserver-utils libtiff5 tzdata firefox libcanberra-gtk-module libcanberra-gtk3-module chromium-browser
+    apt-get update && apt-get install -y wget bzip2 ca-certificates git squashfuse fuse2fs gocryptfs x11-xserver-utils libtiff5 tzdata firefox libcanberra-gtk-module libcanberra-gtk3-module
 
     # Install google chrome - deprecated for chromium due to licensing issues
     #wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
     #apt-get install -y ./google-chrome-stable_current_amd64.deb 
+
+    # Download and install Chromium
+    apt-get install -y unzip libxss1 libnss3 libatk-bridge2.0-0 libgtk-3-0 libgbm1
+    wget -O /tmp/chromium.zip "https://download-chromium.appspot.com/dl/Linux_x64?type=snapshots"
+    unzip /tmp/chromium.zip -d /opt/
+    rm /tmp/chromium.zip
+    ln -s /opt/chrome-linux/chrome /usr/local/bin/chromium-browser
 
     # Clone the organism_query repository
     git clone https://github.com/GSTT-CIDR/organism_query.git
@@ -30,6 +37,9 @@ From: ubuntu:20.04
 
 %environment
     /bin/bash -c 'source /opt/conda/etc/profile.d/conda.sh'
+    export GOOGLE_API_KEY="no"
+    export GOOGLE_DEFAULT_CLIENT_ID="no"
+    export GOOGLE_DEFAULT_CLIENT_SECRET="no"
 
 %runscript
     cd /organism_query/
