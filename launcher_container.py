@@ -165,7 +165,7 @@ if os.path.isfile(icon_path):
 
 # Add description and image
 try:
-    image = Image.open("template/CIDR_logo.png")
+    image = Image.open("/mnt/db/ref/Template/organism_query/CIDR_logo.png")
     resized_image = image.resize((432, 136))
     tk_image = ImageTk.PhotoImage(resized_image)
     label = Label(root, image=tk_image)
