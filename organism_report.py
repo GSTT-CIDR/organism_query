@@ -417,7 +417,7 @@ def build_embedded_plot(output_dir):
         xaxis_title='Percent Identity (%)',
         yaxis_title='Bit score (log scale)'
     )
-    return fig.to_html(full_html=False, include_plotlyjs='cdn')
+    return fig.to_html(full_html=False, include_plotlyjs=True)
 
 def cleanup(output_dir):
     path_html = os.path.join(output_dir, 'blast_results.html')
