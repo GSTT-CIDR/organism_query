@@ -381,6 +381,7 @@ def report_build(output_dir, organism, read_ids, blastdb, total_reads, fastq_dir
         "--no-first-run",
         "--log-level=3",
         "--disable-logging",
+        "--ozone-platform=x11",
         os.path.join(output_dir, 'organism_report.html')
     ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
